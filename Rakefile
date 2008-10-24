@@ -10,8 +10,10 @@ end
 # http://blog.behindlogic.com/2008/10/auto-generate-your-manifest-and-gemspec.html
 desc 'Rebuild manifest and gemspec.'
 task :cultivate do
-  system %q{touch Manifest.txt; rake check_manifest | grep -v "(in " | patch}
-  system %q{rake debug_gem | grep -v "(in " > `basename \`pwd\``.gemspec}
+  Dir.chdir(File.dirname(__FILE__)) do #TODO: Is this required?
+    system %q{git ls-files | grep -v "\.gitignore" > Manifest.txt}
+    system %q{rake debug_gem | grep -v "(in " > `basename \`pwd\``.gemspec}
+  end
 end
 
 # vim: syntax=Ruby
