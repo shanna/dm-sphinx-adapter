@@ -1,5 +1,9 @@
 require 'rubygems'
+
+gem 'dm-core', '~> 0.9'
 require 'dm-core'
+
+gem 'riddle', '~> 0.9'
 require 'riddle'
 
 module DataMapper

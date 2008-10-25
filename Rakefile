@@ -5,6 +5,10 @@ require 'hoe'
 
 Hoe.new('dm-sphinx-adapter', '0.1') do |p|
   p.developer('Shane Hanna', 'shane.hanna@gmail.com')
+  p.extra_deps = [
+    ['dm-core', '~> 0.9'],
+    ['riddle',  '~> 0.9']
+  ]
 end
 
 # http://blog.behindlogic.com/2008/10/auto-generate-your-manifest-and-gemspec.html

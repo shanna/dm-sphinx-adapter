@@ -1,8 +1,8 @@
-= DataMapper Sphinx Adapter
+h1. DataMapper Sphinx Adapter
 
 A Sphinx DataMapper adapter.
 
-== Synopsis
+h2. Synopsis
 
   require 'rubygems'
   require 'dm-core'
@@ -35,6 +35,6 @@ A Sphinx DataMapper adapter.
   # Fire up your sphinx search daemon and start searching.
   Item.search(:name => 'barney') # Search 'items' index for '@name barney'
 
-== Contributing
+h2. Contributing
 
 Go nuts. Just send me a pull request (github or otherwise) when you are happy with your code.
