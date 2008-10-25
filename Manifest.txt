@@ -1,6 +1,5 @@
 History.txt
 Manifest.txt
-README.textile
 README.txt
 Rakefile
 dm-sphinx-adapter.gemspec

@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.description = %q{}
   s.email = ["shane.hanna@gmail.com"]
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "README.txt"]
-  s.files = ["History.txt", "Manifest.txt", "README.textile", "README.txt", "Rakefile", "dm-sphinx-adapter.gemspec", "lib/sphinx_adapter.rb", "test/data/sphinx.conf", "test/fixtures/item.rb", "test/fixtures/item.sql", "test/helper.rb", "test/test_connection.rb", "test/test_search.rb"]
+  s.files = ["History.txt", "Manifest.txt", "README.txt", "Rakefile", "dm-sphinx-adapter.gemspec", "lib/sphinx_adapter.rb", "test/data/sphinx.conf", "test/fixtures/item.rb", "test/fixtures/item.sql", "test/helper.rb", "test/test_connection.rb", "test/test_search.rb"]
   s.has_rdoc = true
   s.homepage = %q{A Sphinx DataMapper adapter.}
   s.rdoc_options = ["--main", "README.txt"]
