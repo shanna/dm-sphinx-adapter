@@ -1,9 +1,10 @@
 History.txt
+LICENCE.txt
 Manifest.txt
 README.txt
 Rakefile
 dm-sphinx-adapter.gemspec
-lib/sphinx_adapter.rb
+lib/dm-sphinx-adapter.rb
 test/data/sphinx.conf
 test/fixtures/item.rb
 test/fixtures/item.sql
