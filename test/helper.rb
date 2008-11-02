@@ -3,6 +3,8 @@ require 'test/fixtures/item'
 require 'test/unit'
 
 DataMapper::Logger.new(STDOUT, 0)
+DataMapper.setup(:default, 'mysql://localhost/dm_sphinx_adapter_test')
+DataMapper.setup(:search,  'sphinx://localhost')
 
 class SphinxHelper
   def initialize

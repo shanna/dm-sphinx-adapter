@@ -11,6 +11,10 @@ class TestSearch < Test::Unit::TestCase
     sphinx.start
   end
 
+  def teardown
+    sphinx.stop
+  end
+
   def test_search_without_arguments
     assert_nothing_raised{ Item.search }
   end

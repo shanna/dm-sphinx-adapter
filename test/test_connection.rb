@@ -9,14 +9,10 @@ class TestConnection < Test::Unit::TestCase
     end
   end
 
-  def test_database_connection
-    assert DataMapper.setup(:default, 'mysql://localhost/dm_sphinx_adapter_test')
-    assert DataMapper.setup(:search,  'sphinx://localhost')
-  end
-
   def test_sphinx_connection
     assert sphinx.index
     assert sphinx.start
     assert sphinx.running?
+    assert sphinx.stop
   end
 end # TestConnection

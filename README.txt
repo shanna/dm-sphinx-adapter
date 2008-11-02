@@ -74,13 +74,41 @@ A Sphinx DataMapper adapter.
   # Fire up your sphinx search daemon and start searching.
   Item.search(:name => 'barney') # Search 'items' index for '@name barney'
 
+=== DataMapper::SphinxResource
+
+For finder grained control you can include DataMapper::SphinxResource. For instance you can search one or more indexes:
+
+  class Item
+    include DataMapper::Resource # Optional, included by SphinxResource if you leave it out yourself.
+    include DataMapper::SphinxResource
+    property :id, Serial
+    property :name, String
+
+    is :searchable
+    repository(:search) do
+      index :items
+      index :items_delta, :delta => true
+    end
+
+  end # Item
+
+  # Fire up your sphinx search daemon and start searching.
+  Item.search(:name => 'barney') # Search 'items, items_delta' index for '@name barney'
+
+== Todo
+
+* Declare attributes. DataMapper::Model#property are treated as fields.
+* Managed Sphinx search daemon and indexer?
+* Give the SphinxAdapter the power to call indexer for live(ish) delta index updates.
+* Loads of documentation. YARD?
+
 == Dependencies
 
-  dm-core is technically the only requirement though I'd recommend using the dm-more plugin dm-is-searchable instead
-  of fetching the document id's yourself.
+dm-core is technically the only requirement though I'd recommend using the dm-more plugin dm-is-searchable instead
+of fetching the document id's yourself.
 
-  Unfortunately dm-is-searchable isn't installed even when you build the dm-more gem from github master. You'll need to
-  build and install the gem yourself from source.
+Unfortunately dm-is-searchable isn't installed even when you build the dm-more gem from github master. You'll need to
+build and install the gem yourself from source.
 
 == Contributing
 

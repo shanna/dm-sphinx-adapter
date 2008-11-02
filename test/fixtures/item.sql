@@ -1,3 +1,11 @@
+drop table if exists delta;
+
+create table delta (
+  name varchar(50) not null,
+  updated_on datetime,
+  primary key (name)
+) engine=innodb default charset=utf8;
+
 drop table if exists items;
 
 create table items (
@@ -5,7 +13,8 @@ create table items (
   name varchar(50) not null,
   likes text not null,
   updated_on datetime,
-  primary key (id)
+  primary key (id),
+  index (updated_on)
 ) engine=innodb default charset=utf8;
 
 insert into items (id, name, likes, updated_on) values
