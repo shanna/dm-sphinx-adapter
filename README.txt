@@ -4,6 +4,39 @@ A Sphinx DataMapper adapter.
 
 == Synopsis
 
+DataMapper uses URIs or a connection has to connect to your data-stores. In this case the sphinx search daemon
+<tt>searchd</tt>.
+
+On its own this adapter will only return an array of document IDs when queried. The dm-more source (not the gem)
+however provides dm-is-searchable, a common interface to search one adapter and load documents from another. My
+suggestion is to use this adapter in tandem with dm-is-searchable.
+
+The dm-is-searchable plugin is part of dm-more though unfortunately isn't built and bundled with dm-more gem.
+You'll need to checkout the dm-more source with Git from git://github.com/sam/dm-more.git and build/install the
+gem yourself.
+
+  git clone git://github.com/sam/dm-more.git
+  cd dm-more/dm-is-searchable
+  sudo rake install_gem
+
+Like all DataMapper adapters you can connect with a Hash or URI.
+
+A URI:
+  DataMapper.setup(:search, 'sphinx://localhost')
+
+The breakdown is:
+  "#{adapter}://#{host}:#{port}/#{config}"
+  - adapter Must be :sphinx
+  - host    Hostname (default: localhost)
+  - port    Optional port number (default: 3312)
+
+Alternatively supply a Hash:
+  DataMapper.setup(:search, {
+    :adapter  => 'sphinx',    # required
+    :host     => 'localhost', # optional (default: localhost)
+    :port     => 3312         # optional (default: 3312(
+  })
+
 === DataMapper
 
   require 'rubygems'

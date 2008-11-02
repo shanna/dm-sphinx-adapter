@@ -1,6 +1,18 @@
 module DataMapper
+  ##
+  # Declare Sphinx indexes in your resource.
+  #
+  #   model Items
+  #     include Sphinx::Resource
+  #
+  #     repository(:search) do
+  #       # Query some_index, some_index_delta in that order.
+  #       index :some_index
+  #       index :some_index_delta, :delta => true
+  #     end
+  #   end
   module SphinxResource
-    def self.included(model)
+    def self.included(model) #:nodoc:
       model.class_eval do
         include DataMapper::Resource
         extend ClassMethods
@@ -8,15 +20,18 @@ module DataMapper
     end
 
     module ClassMethods
-      def self.extended(model)
+      def self.extended(model) #:nodoc:
         model.instance_variable_set(:@sphinx_indexes, {})
       end
 
       ##
-      # defines a sphinx index on the resource
+      # Defines a sphinx index on the resource.
       #
-      # @param <Symbol> name the name of a sphinx index to search for this resource
-      # @param <Hash(Symbol => String)> options a hash of available options
+      # Indexes are naturally ordered, with delta indexes at the end of the list so that duplicate document IDs in
+      # delta indexes override your main indexes.
+      #
+      # @param [Symbol] name the name of a sphinx index to search for this resource
+      # @param [Hash(Symbol => String)] options a hash of available options
       # @see   DataMapper::SphinxIndex
       def index(name, options = {})
         index   = SphinxIndex.new(self, name, options)
@@ -32,6 +47,8 @@ module DataMapper
         index
       end
 
+      ##
+      # List of declared sphinx indexes for this model.
       def sphinx_indexes(repository_name = default_repository_name)
         @sphinx_indexes[repository_name] ||= []
       end

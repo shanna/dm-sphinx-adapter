@@ -6,7 +6,7 @@ require 'hoe'
 Hoe.new('dm-sphinx-adapter', '0.1') do |p|
   p.developer('Shane Hanna', 'shane.hanna@gmail.com')
   p.extra_deps = [
-    ['dm-core', '~> 0.9.6'],
+    ['dm-core', '~> 0.9.7'],
     ['riddle',  '~> 0.9']
   ]
 end

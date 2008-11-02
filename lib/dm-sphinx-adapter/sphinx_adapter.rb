@@ -2,10 +2,44 @@ require 'benchmark'
 
 module DataMapper
   module Adapters
+
+    # == Synopsis
+    # DataMapper uses URIs or a connection has to connect to your data-stores. In this case the sphinx search daemon
+    # <tt>searchd</tt>.
+    #
+    # On its own this adapter will only return an array of document IDs when queried. The dm-more source (not the gem)
+    # however provides dm-is-searchable, a common interface to search one adapter and load documents from another. My
+    # suggestion is to use this adapter in tandem with dm-is-searchable.
+    #
+    # The dm-is-searchable plugin is part of dm-more though unfortunately isn't built and bundled with dm-more gem.
+    # You'll need to checkout the dm-more source with Git from git://github.com/sam/dm-more.git and build/install the
+    # gem yourself.
+    #
+    #   git clone git://github.com/sam/dm-more.git
+    #   cd dm-more/dm-is-searchable
+    #   sudo rake install_gem
+    #
+    # Like all DataMapper adapters you can connect with a Hash or URI.
+    #
+    # A URI:
+    #   DataMapper.setup(:search, 'sphinx://localhost')
+    #
+    # The breakdown is:
+    #   "#{adapter}://#{host}:#{port}/#{config}"
+    #   - adapter Must be :sphinx
+    #   - host    Hostname (default: localhost)
+    #   - port    Optional port number (default: 3312)
+    #
+    # Alternatively supply a Hash:
+    #   DataMapper.setup(:search, {
+    #     :adapter  => 'sphinx',    # required
+    #     :host     => 'localhost', # optional (default: localhost)
+    #     :port     => 3312         # optional (default: 3312(
+    #   })
     class SphinxAdapter < AbstractAdapter
 
-      # Keep in mind dm-is-searchable fires .create on :save.
       def create(resources)
+        # Keep in mind dm-is-searchable fires .create on :save.
         indexes = resources.map{|r| delta_indexes(r.model)}.flatten.uniq
         rotate  = indexes.map{|d| d.name}.join(' ')
         return true if rotate.empty?
@@ -34,18 +68,33 @@ module DataMapper
       end
 
       protected
+        ##
+        # List sphinx indexes to search.
+        # If no indexes are explicitly declared using DataMapper::SphinxResource then the tableized model name is used.
+        #
+        # @see DataMapper::SphinxResource#sphinx_indexes
         def indexes(model)
-          if model.respond_to?(:sphinx_indexes)
-            model.sphinx_indexes(repository(self.name).name)
-          else
-            [SphinxIndex.new(model, Extlib::Inflection.tableize(model.name))]
+          indexes = model.sphinx_indexes(repository(self.name).name) if model.respond_to?(:sphinx_indexes)
+          if indexes.nil? or indexes.empty?
+            # TODO: Is it resource_naming_convention.call(model.name) ?
+            indexes = [SphinxIndex.new(model, Extlib::Inflection.tableize(model.name))]
           end
+          indexes
         end
 
+        ##
+        # List sphinx delta indexes to search.
+        #
+        # @see DataMapper::SphinxResource#sphinx_indexes
         def delta_indexes(model)
           indexes(model).find_all{|i| i.delta?}
         end
 
+
+        ##
+        # Query sphinx for a list of document IDs.
+        #
+        # @param [DataMapper::Query]
         def read(query)
           # TODO: .load ourselves from :default when not DataMapper::Is::Searchable?
           from   = indexes(query.model).map{|index| index.name}.join(', ')
@@ -60,6 +109,14 @@ module DataMapper
           res[:matches].map{|doc| doc[:doc]}
         end
 
+        ##
+        # Initialize a Riddle::Client.
+        #
+        # At the moment this client is always in extended mode until I figure out how to mess with what arguments
+        # DataMapper::Query will accept.
+        #
+        # @param [DataMapper::Query]
+        # @return [Riddle::Client]
         def client_from_dm_query(query)
           # TODO: Self hosting? Move this code into the Client lib that'll take care of searchd and indexer.
           # Use the @url.path from initialize to find the location of your sphinx .conf
@@ -76,13 +133,20 @@ module DataMapper
           client
         end
 
+        ##
+        # Generate a Sphinx search query string.
+        #
+        # If the query has no conditions an '' empty string will be generated possibly triggering Sphinx's full scan
+        # mode.
+        #
+        # @see    http://www.sphinxsearch.com/doc.html#searching
+        # @see    http://www.sphinxsearch.com/doc.html#conf-docinfo
+        # @param  [DataMapper::Query]
+        # @return [String]
         def search_query(query)
           match  = []
 
           if query.conditions.empty?
-            # Full scan mode.
-            # http://www.sphinxsearch.com/doc.html#searching
-            # http://www.sphinxsearch.com/doc.html#conf-docinfo
             match << ''
           else
             # TODO: This needs to be altered by match mode since not everything is supported in different match modes.
@@ -104,6 +168,7 @@ module DataMapper
           match.join(' ')
         end
 
+        ##
         # Ripped pretty much straight from the 0.9.7 data objects adapter.
         # I don't understand why this isn't in the abstract adapter.
         def normalize_uri(uri_or_options)

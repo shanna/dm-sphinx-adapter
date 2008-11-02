@@ -5,6 +5,9 @@ README.txt
 Rakefile
 dm-sphinx-adapter.gemspec
 lib/dm-sphinx-adapter.rb
+lib/dm-sphinx-adapter/sphinx_adapter.rb
+lib/dm-sphinx-adapter/sphinx_index.rb
+lib/dm-sphinx-adapter/sphinx_resource.rb
 test/data/sphinx.conf
 test/fixtures/item.rb
 test/fixtures/item.sql
