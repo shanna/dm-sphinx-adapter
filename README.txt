@@ -109,7 +109,7 @@ Alternatively supply a Hash:
 
 === DataMapper::SphinxResource
 
-For finde grained control you can include DataMapper::SphinxResource. For instance you can search one or more indexes:
+For finer grained control you can include DataMapper::SphinxResource. For instance you can search one or more indexes:
 
   class Item
     include DataMapper::Resource # Optional, included by SphinxResource if you leave it out yourself.
