@@ -26,4 +26,10 @@ class TestSearch < Test::Unit::TestCase
     assert_nothing_raised{ Item.search }
     assert_nothing_raised{ Item.search(:name => 'foo') }
   end
+
+  def test_search_attributes
+    assert_nothing_raised do
+      Item.search(:updated => (Time.now - 10 .. Time.now + 10))
+    end
+  end
 end # TestSearch

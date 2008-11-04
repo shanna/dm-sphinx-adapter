@@ -12,5 +12,6 @@ require dir / 'sphinx_config'
 require dir / 'sphinx_client'
 require dir / 'sphinx_adapter'
 require dir / 'sphinx_index'
+require dir / 'sphinx_attribute'
 require dir / 'sphinx_resource'
 

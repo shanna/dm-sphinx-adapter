@@ -5,10 +5,17 @@ module DataMapper
   #   model Items
   #     include Sphinx::Resource
   #
+  #     # .. normal properties and such for :default
+  #
   #     repository(:search) do
   #       # Query some_index, some_index_delta in that order.
   #       index :some_index
   #       index :some_index_delta, :delta => true
+  #
+  #       # Sortable by some attributes.
+  #       attribute :updated_at, DateTime  # sql_attr_timestamp
+  #       attribute :age, Integer          # sql_attr_uint
+  #       attribute :deleted, Boolean      # sql_attr_bool
   #     end
   #   end
   module SphinxResource
@@ -22,6 +29,7 @@ module DataMapper
     module ClassMethods
       def self.extended(model) #:nodoc:
         model.instance_variable_set(:@sphinx_indexes, {})
+        model.instance_variable_set(:@sphinx_attributes, {})
       end
 
       ##
@@ -51,6 +59,27 @@ module DataMapper
       # List of declared sphinx indexes for this model.
       def sphinx_indexes(repository_name = default_repository_name)
         @sphinx_indexes[repository_name] ||= []
+      end
+
+      ##
+      # Defines a sphinx attribute on the resource.
+      #
+      # @param [Symbol] name the name of a sphinx attribute to order/restrict by for this resource
+      # @param [Class] type the type to define this attribute as
+      # @param [Hash(Symbol => String)] options a hash of available options
+      # @see   DataMapper::SphinxAttribute
+      def attribute(name, type, options = {})
+        # Attributes are just properties without a getter/setter in the model.
+        # This keeps DataMapper::Query happy when building queries.
+        attribute = SphinxAttribute.new(self, name, type, options)
+        properties(repository_name)[attribute.name] = attribute
+        attribute
+      end
+
+      ##
+      # List of declared sphinx attributes for this model.
+      def sphinx_attributes(repository_name = default_repository_name)
+        properties(repository_name).grep{|p| p.kind_of? SphinxAttribute}
       end
 
     end # ClassMethods

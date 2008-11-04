@@ -1,5 +1,4 @@
 require 'rubygems'
-
 require 'dm-is-searchable'
 require 'zlib'
 
@@ -16,6 +15,9 @@ class Item
   repository(:search) do
     index :items
     index :items_delta, :delta => true
+
+    # TODO: More attributes.
+    attribute :updated, DateTime
   end
 
   # I'm using my own (unreleased) Digest::CRC32 DataMapper::Type normally.

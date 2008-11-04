@@ -1,5 +1,7 @@
 require 'benchmark'
 
+# TODO: I think perhaps I should move all the query building code to a lib of its own.
+
 module DataMapper
   module Adapters
 
@@ -102,13 +104,22 @@ module DataMapper
         # @param [DataMapper::Query]
         def read(query)
           # TODO: .load ourselves from :default when not DataMapper::Is::Searchable?
-          from   = indexes(query.model).map{|index| index.name}.join(', ')
-          search = search_query(query)
-          res    = @client.search(search, from,
+          from    = indexes(query.model).map{|index| index.name}.join(', ')
+          search  = search_query(query)
+          options = {
             :match_mode => :extended, # TODO: Modes!
             :limit      => (query.limit  ? query.limit.to_i : 0),
-            :offset     => (query.offset ? query.offset.to_i : 0)
-          )
+            :offset     => (query.offset ? query.offset.to_i : 0),
+            :filters    => search_filters(query) # By attribute.
+          }
+          if order = search_order(query)
+            options.update(
+              :sort_mode = :extended,
+              :sort_by   = order
+            )
+          end
+
+          res = @client.search(search, from, options)
           raise res[:error] unless res[:error].nil?
 
           DataMapper.logger.info(
@@ -117,8 +128,9 @@ module DataMapper
           res[:matches].map{|doc| doc[:doc]}
         end
 
+
         ##
-        # Generate a Sphinx search query string.
+        # Sphinx search query string from properties (fields).
         #
         # If the query has no conditions an '' empty string will be generated possibly triggering Sphinx's full scan
         # mode.
@@ -135,14 +147,15 @@ module DataMapper
           else
             # TODO: This needs to be altered by match mode since not everything is supported in different match modes.
             query.conditions.each do |operator, property, value|
+              next if property.kind_of? SphinxAttribute # Filters are added elsewhere.
               # TODO: Why does my gem riddle differ from the vendor riddle that comes with ts?
               # escaped_value = Riddle.escape(value)
-              escaped_value = value.gsub(/[\(\)\|\-!@~"&\/]/){|char| "\\#{char}"}
+              escaped_value = value.to_s.gsub(/[\(\)\|\-!@~"&\/]/){|char| "\\#{char}"}
               match << case operator
                 when :eql, :like then "@#{property.field} #{escaped_value}"
                 when :not        then "@#{property.field} -#{escaped_value}"
                 when :lt, :gt, :lte, :gte
-                  DataMapper.logger.warn('Sphinx query lt, gt, lte, gte are treated as .eql matches')
+                  DataMapper.logger.warn('Sphinx: Query properties with lt, gt, lte, gte are treated as .eql')
                   "@#{name} #{escaped_value}"
                 when :raw
                   "#{property}"
@@ -150,6 +163,55 @@ module DataMapper
             end
           end
           match.join(' ')
+        end
+
+        ##
+        # Sphinx search query filters from attributes.
+        # @param  [DataMapper::Query]
+        # @return [Array]
+        def search_filters(query)
+          filters = []
+          query.conditions.each do |operator, attribute, value|
+            next unless attribute.kind_of? SphinxAttribute
+            # TODO: Value cast to uint, bool, str2ordinal, float
+            filters << case operator
+              when :eql, :like then Riddle::Client::Filter.new(attribute.name.to_s, filter_value(value))
+              when :not        then Riddle::Client::Filter.new(attribute.name.to_s, filter_value(value), true)
+              else
+                error = "Sphinx: Query attributes do not support the #{operator} operator"
+                DataMapper.logger.error(error)
+                raise error # TODO: RuntimeError subclass and more information about the actual query.
+            end
+          end
+          filters
+        end
+
+        ##
+        # Order by attributes.
+        #
+        # @return [String or Symbol]
+        def search_order(query)
+          by = []
+          # TODO: How do you tell the difference between the default query order and someone explicitly asking for
+          # sorting by the primary key?
+          query.order.each do |order|
+            next unless order.property.kind_of? SphinxAttribute
+            by << [order.property.field, order.direction].join(' ')
+          end
+          by.empty? ? nil : by.join(', ')
+        end
+
+        # TODO: Move this to SphinxAttribute#something.
+        # This is ninja'd straight from TS just to get things going.
+        def filter_value(value)
+          case value
+            when Range
+              value.first.is_a?(Time) ? value.first.to_i..value.last.to_i : value
+            when Array
+              value.collect { |val| val.is_a?(Time) ? val.to_i : val }
+            else
+              Array(value)
+          end
         end
     end # SphinxAdapter
   end # Adapters

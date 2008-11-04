@@ -5,8 +5,8 @@ module DataMapper
     attr_reader :model, :name, :options
 
     def initialize(model, name, options = {})
-      assert_kind_of 'model', model, Model
-      assert_kind_of 'name',  name,  Symbol, String
+      assert_kind_of 'model',   model,   Model
+      assert_kind_of 'name',    name,    Symbol, String
       assert_kind_of 'options', options, Hash
 
       @model = model
