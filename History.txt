@@ -1,2 +1,7 @@
+=== 0.2 / 2008-11-09
+
+  * Addributes.
+  * Self managed searchd daemon if you want it.
+
 === 0.1 / 2008-10-24
 
