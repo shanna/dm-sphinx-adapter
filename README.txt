@@ -29,13 +29,16 @@ The breakdown is:
   - adapter Must be :sphinx
   - host    Hostname (default: localhost)
   - port    Optional port number (default: 3312)
+  - config  Optional but strongly recommended path to sphinx config file.
 
 Alternatively supply a Hash:
   DataMapper.setup(:search, {
-    :adapter  => 'sphinx',    # required
-    :host     => 'localhost', # optional (default: localhost)
-    :port     => 3312         # optional (default: 3312(
-  })
+    :adapter  => 'sphinx',       # required
+    :config   => './sphinx.conf' # optional. Recommended though.
+    :host     => 'localhost',    # optional. Default: localhost
+    :port     => 3312            # optional. Default: 3312
+    :managed  => true            # optional. Self managed searchd server using daemon_controller.
+  }
 
 === DataMapper
 
@@ -109,7 +112,8 @@ Alternatively supply a Hash:
 
 === DataMapper::SphinxResource
 
-For finer grained control you can include DataMapper::SphinxResource. For instance you can search one or more indexes:
+For finer grained control you can include DataMapper::SphinxResource. For instance you can search one or more indexes
+and sort, include or exclude by attributes defined in your sphinx configuration:
 
   class Item
     include DataMapper::Resource # Optional, included by SphinxResource if you leave it out yourself.
@@ -121,24 +125,59 @@ For finer grained control you can include DataMapper::SphinxResource. For instan
     repository(:search) do
       index :items
       index :items_delta, :delta => true
+
+      # Sphinx attributes to sort include/exclude by.
+      attribute :updated_on, DateTime
     end
 
   end # Item
 
-  # Fire up your sphinx search daemon and start searching.
-  Item.search(:name => 'barney') # Search 'items, items_delta' index for '@name barney'
+  # Search 'items, items_delta' index for '@name barney' updated in the last 30 minutes.
+  Item.search(:name => 'barney', :updated => (Time.now - 1800 .. Time.now))
+
+== Sphinx Configuration.
+
+Though you don't have to supply the sphinx configuration file to dm-sphinx-adapter I'd recommend doing it anyway.
+It's more DRY since all searchd/indexer options can be read straight from the configuration.
+
+  DataMapper.setup(:search, :adapter => 'sphinx', :config => '/path/to/sphinx.conf')
+  DataMapper.setup(:search, 'sphinx://localhost/path/to/sphinx.conf')
+
+If your sphinx.conf lives in either of the default locations /usr/local/etc/sphinx.conf or ./sphinx.conf then you
+only need to supply:
+
+  DataMapper.setup(:search, :adapter => 'sphinx')
+
+== Searchd
+
+As of 0.2 I've added a managed searchd option using daemon_controller. It may come in handy if you only use God, Monit
+or whatever in production. Use the Hash form of DataMapper#setup and supply the option :managed with a true value and
+daemon_controller will start searchd on demand.
+
+It is already strongly encouraged but you will need to specify the path to your sphinx configuration file in order for
+searchd to run. See Sphinx Configuration, DataMapper::SphinxManagedClient.
+
+The daemon_controller library can be found only on github, not rubyforge.
+See http://github.com/FooBarWidget/daemon_controller/tree/master
+
+== Indexer
+
+As of 0.2 the indexer will be fired on create/update if you have delta indexes defined. Deletes are not supported yet
+because I haven't found a reliable way of doing them without imposing configuration requirements as thinking-sphinx
+does. Ideas welcome.
 
 == Todo
 
-* Declare attributes. DataMapper::Model#property are treated as fields.
-* Managed Sphinx search daemon and indexer?
+* Generate sphinx.conf from properties, attributes and indexes? SphinxAdapter#migrate! perhaps?
+* Option to disable indexing after create/update.
+* Tie indexing to transactions? Stall indexer calls till commit.
 * Give the SphinxAdapter the power to call indexer for live(ish) delta index updates.
 * Loads of documentation. YARD?
 
 == Dependencies
 
-dm-core is technically the only requirement though I'd recommend using the dm-more plugin dm-is-searchable instead
-of fetching the document id's yourself.
+dm-core and riddle are technically the only requirements though I'd recommend using the dm-more plugin dm-is-searchable
+instead of fetching the document id's yourself.
 
 Unfortunately dm-is-searchable isn't installed even when you build the dm-more gem from github master. You'll need to
 build and install the gem yourself from source.
