@@ -114,8 +114,8 @@ module DataMapper
           }
           if order = search_order(query)
             options.update(
-              :sort_mode = :extended,
-              :sort_by   = order
+              :sort_mode => :extended,
+              :sort_by   => order
             )
           end
 
