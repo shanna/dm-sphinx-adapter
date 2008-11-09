@@ -8,18 +8,22 @@ class TestSearch < Test::Unit::TestCase
         or raise %q{Tests require the dm_sphinx_adapter_test.items table.}
     end
 
-    sphinx.start
+    @config = Pathname.new(__FILE__).dirname.expand_path / 'data' / 'sphinx.conf'
+    DataMapper.setup(:default, 'mysql://localhost/dm_sphinx_adapter_test')
+    DataMapper.setup(:search,
+      :adapter => 'sphinx',
+      :config  => @config,
+      :managed => true
+    )
   end
 
   def teardown
-    sphinx.stop
+    client = DataMapper::SphinxManagedClient.new(@config)
+    client.stop
   end
 
-  def test_search_without_arguments
+  def test_search
     assert_nothing_raised{ Item.search }
-  end
-
-  def test_search_extended
     assert_nothing_raised{ Item.search(:name => 'foo') }
   end
 end # TestSearch
