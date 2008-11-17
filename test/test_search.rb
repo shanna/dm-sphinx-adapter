@@ -18,8 +18,10 @@ class TestSearch < Test::Unit::TestCase
   end
 
   def teardown
-    client = DataMapper::SphinxManagedClient.new(@config)
-    client.stop
+    DataMapper.repository(:search).adapter.client.stop
+    # You can also build a new client with the same config and call stop on that.
+    # client = DataMapper::SphinxManagedClient.new(@config)
+    # client.stop
   end
 
   def test_search

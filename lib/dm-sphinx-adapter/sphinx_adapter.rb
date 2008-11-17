@@ -42,7 +42,6 @@ module DataMapper
     #     :managed  => true            # optional. Self managed searchd server using daemon_controller.
     #   })
     class SphinxAdapter < AbstractAdapter
-
       ##
       # Initialize the sphinx adapter.
       #
@@ -52,25 +51,22 @@ module DataMapper
       def initialize(name, uri_or_options)
         super
 
-        @managed = !!(uri_or_options.kind_of?(Hash) && uri_or_options[:managed])
-        @client  = @managed ? SphinxManagedClient.new(uri_or_options) : SphinxClient.new(uri_or_options)
+        managed = !!(uri_or_options.kind_of?(Hash) && uri_or_options[:managed])
+        @client  = managed ? SphinxManagedClient.new(uri_or_options) : SphinxClient.new(uri_or_options)
       end
 
-      def create(resources)
-        # Keep in mind dm-is-searchable fires .create on :save.
-        indexes = resources.map{|r| delta_indexes(r.model)}.flatten.uniq
-        rotate  = indexes.map{|d| d.name}.join(' ')
-        return true if rotate.empty?
+      ##
+      # Interaction with searchd and indexer.
+      #
+      # @see DataMapper::SphinxClient
+      # @see DataMapper::SphinxManagedClient
+      attr_reader :client
 
-        time = Benchmark.realtime{ @client.index(rotate) }
-        DataMapper.logger.debug(%q{Sphinx (%.3f): indexed '%s' index(es)} % [time, rotate])
-        resources.size
+      def create(resources) #:nodoc:
+        true
       end
 
-      def delete(query)
-        DataMapper.logger.debug(%q{Sphinx (%.3f): TODO: delete})
-        # TODO: Thinking Sphinx uses a deleted attribute in sphinx.conf but that's a requirement I don't really want to
-        # impose on the author. I'll go check what ultrasphinx does.
+      def delete(query) #:nodoc:
         true
       end
 
@@ -110,7 +106,6 @@ module DataMapper
         #
         # @param [DataMapper::Query]
         def read(query)
-          # TODO: .load ourselves from :default when not DataMapper::Is::Searchable?
           from    = indexes(query.model).map{|index| index.name}.join(', ')
           search  = search_query(query)
           options = {
@@ -134,7 +129,6 @@ module DataMapper
           )
           res[:matches].map{|doc| doc[:doc]}
         end
-
 
         ##
         # Sphinx search query string from properties (fields).

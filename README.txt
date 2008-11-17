@@ -160,19 +160,24 @@ searchd to run. See Sphinx Configuration, DataMapper::SphinxManagedClient.
 The daemon_controller library can be found only on github, not rubyforge.
 See http://github.com/FooBarWidget/daemon_controller/tree/master
 
-== Indexer
+== Indexer and Live(ish) updates.
 
-As of 0.2 the indexer will be fired on create/update if you have delta indexes defined. Deletes are not supported yet
-because I haven't found a reliable way of doing them without imposing configuration requirements as thinking-sphinx
-does. Ideas welcome.
+As of 0.3 the indexer will no longer be fired on create/update even if you have delta indexes defined. Sphinx indexing
+is blazing fast but unless your resource sees very little activity you will run the risk of lock errors on
+the temporary delta index files (.tmpl.sp1) and your delta index won't be updated. Given this functionality is
+unreliable at best I've chosen to remove it.
+
+For reliable live(ish) updates in a main + delta scheme it's probably best you schedule them outside of your ORM.
+Andrew (Shodan) Aksyonoff of Sphinx suggests a cronjob or alternatively if you need even less lag to "run indexer in
+an endless loop, with a few seconds of sleep in between to allow searchd some headroom to pick up the changes".
 
 == Todo
 
-* Generate sphinx.conf from properties, attributes and indexes? SphinxAdapter#migrate! perhaps?
-* Option to disable indexing after create/update.
-* Tie indexing to transactions? Stall indexer calls till commit.
-* Give the SphinxAdapter the power to call indexer for live(ish) delta index updates.
-* Loads of documentation. YARD?
+* Tests. Clearly I only test what I see as important or broken which drives TDD people crazy sometimes :)
+* Loads of documentation. Most of it is unchecked YARD at the moment.
+* Add DataMapper::SphinxClient#attribute_set to allow attribute modification on one or more indexes. It's the only
+  thing missing if you understand the pitfalls and still want to add thinking-sphinx like delta indexing to your
+  resource.
 
 == Dependencies
 

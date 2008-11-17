@@ -1,3 +1,8 @@
+=== 0.3 / 2008-11-18
+
+  * Removed calls to indexer on create/update. See README.txt
+  * Made the client object available from the adapter.
+
 === 0.2 / 2008-11-09
 
   * Addributes.
