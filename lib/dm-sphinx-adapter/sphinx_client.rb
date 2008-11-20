@@ -6,10 +6,17 @@ require 'riddle'
 module DataMapper
   class SphinxClient
     def initialize(uri_or_options)
+      # TODO: Documentation.
       @config = SphinxConfig.new(uri_or_options)
     end
 
-    # TODO: What about filters?
+    ##
+    # Search one or more indexes.
+    #
+    # @param [String] query The sphinx query string.
+    # @param [Array, String] indexes A string or array of indexes to search. Default is '*' (all).
+    # @param [Hash] options Any options you'd like to pass through to Riddle::Client.
+    # @see   Riddle::Client
     def search(query, indexes = '*', options = {})
       indexes = indexes.join(' ') if indexes.kind_of?(Array)
 

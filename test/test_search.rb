@@ -1,5 +1,6 @@
 require 'helper'
 
+
 class TestSearch < Test::Unit::TestCase
   def setup
     # TODO: A little too brutal for me.
@@ -27,16 +28,19 @@ class TestSearch < Test::Unit::TestCase
   def test_search
     assert_nothing_raised{ Item.search }
     assert_nothing_raised{ Item.search(:name => 'foo') }
+    assert !Item.search(:name => 'foo').empty?
   end
 
   def test_search_resource_only
     assert_nothing_raised{ ItemResourceOnly.search }
     assert_nothing_raised{ ItemResourceOnly.search(:name => 'foo') }
+    assert !ItemResourceOnly.search(:name => 'foo').empty?
   end
 
   def test_search_resource_explicit
     assert_nothing_raised{ ItemResourceExplicit.search }
     assert_nothing_raised{ ItemResourceExplicit.search(:name => 'foo') }
+    assert !ItemResourceExplicit.search(:name => 'foo').empty?
   end
 
   def test_search_attributes

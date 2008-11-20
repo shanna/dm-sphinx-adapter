@@ -109,10 +109,11 @@ module DataMapper
           search  = search_query(query)
           options = {
             :match_mode => :extended, # TODO: Modes!
-            :limit      => (query.limit  ? query.limit.to_i : 0),
-            :offset     => (query.offset ? query.offset.to_i : 0),
             :filters    => search_filters(query) # By attribute.
           }
+          options[:limit]  = query.limit.to_i  if query.limit
+          options[:offset] = query.offset.to_i if query.offset
+
           if order = search_order(query)
             options.update(
               :sort_mode => :extended,
@@ -126,7 +127,7 @@ module DataMapper
           DataMapper.logger.info(
             %q{Sphinx (%.3f): search '%s' in '%s' found %d documents} % [res[:time], search, from, res[:total]]
           )
-          res[:matches].map{|doc| doc[:doc]}
+          res[:matches].map{|doc| {:id => doc[:doc]}}
         end
 
         ##
