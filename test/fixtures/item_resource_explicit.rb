@@ -20,8 +20,8 @@ class ItemResourceExplicit
     attribute :updated, DateTime
   end
 
-  def default_storage_name
-    'items'
+  def self.default_storage_name
+    'item'
   end
 
   # I'm using my own (unreleased) Digest::CRC32 DataMapper::Type normally.
