@@ -64,9 +64,7 @@ module DataMapper
     end
 
     def search(*args)
-      @client.connect do
-        super *args
-      end
+      @client.connect{super}
     end
 
     def stop

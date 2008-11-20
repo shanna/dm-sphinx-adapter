@@ -2,8 +2,9 @@ require 'rubygems'
 require 'dm-is-searchable'
 require 'zlib'
 
-class Item
+class ItemResourceOnly
   include DataMapper::Resource
+  include DataMapper::SphinxResource
 
   property :id,         Integer, :key => true, :writer => :private
   property :name,       String, :nullable => false, :length => 50
@@ -12,6 +13,10 @@ class Item
 
   is :searchable
 
+  def self.default_storage_name
+    'item'
+  end
+
   # I'm using my own (unreleased) Digest::CRC32 DataMapper::Type normally.
   after :name, :set_id
 
@@ -19,4 +24,5 @@ class Item
     def set_id
       attribute_set(:id, Zlib.crc32(name))
     end
-end # Item
+end # ItemResourceOnly
+

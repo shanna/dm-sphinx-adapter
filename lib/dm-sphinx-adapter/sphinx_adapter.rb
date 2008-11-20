@@ -87,8 +87,7 @@ module DataMapper
         def indexes(model)
           indexes = model.sphinx_indexes(repository(self.name).name) if model.respond_to?(:sphinx_indexes)
           if indexes.nil? or indexes.empty?
-            # TODO: Is it resource_naming_convention.call(model.name) ?
-            indexes = [SphinxIndex.new(model, Extlib::Inflection.tableize(model.name))]
+            indexes = [SphinxIndex.new(model, model.storage_name)]
           end
           indexes
         end

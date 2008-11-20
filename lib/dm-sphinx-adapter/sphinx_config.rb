@@ -13,7 +13,20 @@ module DataMapper
     # This class just gives you access to handy searchd {} configuration options. It does not validate your
     # configuration file beyond basic syntax checking.
     def initialize(uri_or_options = {})
-      @config = []
+      @config  = []
+      @searchd = {
+        'address'         => '0.0.0.0',
+        'log'             => 'searchd.log',
+        'max_children'    => 0,
+        'max_matches'     => 1000,
+        'pid_file'        => nil,
+        'port'            => 3312,
+        'preopen_indexes' => 0,
+        'query_log'       => '',
+        'read_timeout'    => 5,
+        'seamless_rotate' => 1,
+        'unlink_old'      => 1
+      }
 
       path = case uri_or_options
         when Addressable::URI, DataObjects::URI then uri_or_options.path
@@ -75,26 +88,8 @@ module DataMapper
     ##
     # Searchd configuration options.
     #
-    # Defaults will be applied but no validation is done.
-    #
     # @see http://www.sphinxsearch.com/doc.html#confgroup-searchd
     def searchd
-      unless @searchd
-        searchd = @blocks.find{|c| c['type'] =~ /searchd/i} || {}
-        @searchd = {
-          'address'         => '0.0.0.0',
-          'log'             => 'searchd.log',
-          'max_children'    => 0,
-          'max_matches'     => 1000,
-          'pid_file'        => nil,
-          'port'            => 3312,
-          'preopen_indexes' => 0,
-          'query_log'       => '',
-          'read_timeout'    => 5,
-          'seamless_rotate' => 1,
-          'unlink_old'      => 1
-        }.update(searchd)
-      end
       @searchd
     end
 
@@ -105,6 +100,7 @@ module DataMapper
       #
       # @param [String] path Searches path, ./path, /path, /usr/local/etc/sphinx.conf, ./sphinx.conf in that order.
       def parse(path = '')
+        # TODO: Three discrete things going on here, should be three subs.
         paths = [
           path,
           path.gsub(%r{^/}, './'),
@@ -121,7 +117,11 @@ module DataMapper
         source.gsub!(/\r\n|\r|\n/, "\n") # Everything in \n
         source.gsub!(/\s*\\\n\s*/, ' ')  # Remove unixy line wraps.
         @in = StringScanner.new(source)
-        blocks(@blocks = [])
+        blocks(blocks = [])
+        @in = nil
+
+        searchd = blocks.find{|c| c['type'] =~ /searchd/i} || {}
+        @searchd.update(searchd)
       end
 
     private

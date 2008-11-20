@@ -14,6 +14,8 @@ lib/dm-sphinx-adapter/sphinx_resource.rb
 test/data/sphinx.conf
 test/fixtures/item.rb
 test/fixtures/item.sql
+test/fixtures/item_resource_explicit.rb
+test/fixtures/item_resource_only.rb
 test/helper.rb
 test/test_client.rb
 test/test_config.rb

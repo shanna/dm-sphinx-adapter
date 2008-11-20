@@ -29,9 +29,20 @@ class TestSearch < Test::Unit::TestCase
     assert_nothing_raised{ Item.search(:name => 'foo') }
   end
 
+  def test_search_resource_only
+    assert_nothing_raised{ ItemResourceOnly.search }
+    assert_nothing_raised{ ItemResourceOnly.search(:name => 'foo') }
+  end
+
+  def test_search_resource_explicit
+    assert_nothing_raised{ ItemResourceExplicit.search }
+    assert_nothing_raised{ ItemResourceExplicit.search(:name => 'foo') }
+  end
+
   def test_search_attributes
+    # Attributes that exist only in :search and the sphinx.
     assert_nothing_raised do
-      Item.search(:updated => (Time.now - 10 .. Time.now + 10))
+      ItemResourceExplicit.search(:updated => (Time.now - 10 .. Time.now + 10))
     end
   end
 end # TestSearch
