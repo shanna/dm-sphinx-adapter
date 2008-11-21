@@ -1,13 +1,16 @@
 require 'rubygems'
 require 'dm-is-searchable'
-require 'zlib'
 
-class Item
+class Searchable
   include DataMapper::Resource
   property :id,         Serial
-  property :name,       String, :nullable => false, :length => 50
-  property :likes,      Text
+  property :name,       String
+  property :likes,      Text, :lazy => false
   property :updated_on, DateTime
 
   is :searchable
-end # Item
+
+  def self.default_storage_name
+    'item'
+  end
+end # Searchable

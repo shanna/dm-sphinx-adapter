@@ -16,6 +16,6 @@ create table items (
 ) engine=innodb default charset=utf8;
 
 insert into items (name, likes, updated_on) values
-  ('foo', 'I really like foo!', now()),
-  ('bar', 'I really like bar!', now()),
-  ('baz', 'I really like baz!', now());
+  ('one', 'I really like one!', now()),
+  ('two', 'I really like two!', now()),
+  ('three', 'I really like three!', now());

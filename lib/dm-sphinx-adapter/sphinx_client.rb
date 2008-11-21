@@ -75,7 +75,7 @@ module DataMapper
     end
 
     def stop
-      @client.stop
+      @client.stop if @client.running?
     end
   end # SphinxManagedClient
 end # DataMapper

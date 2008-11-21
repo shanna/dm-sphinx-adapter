@@ -1,20 +1,8 @@
-require 'helper'
+require 'test_adapter'
 
-class TestClient < Test::Unit::TestCase
-  def setup
-    @config = Pathname.new(__FILE__).dirname.expand_path / 'data' / 'sphinx.conf'
-
-    # TODO: A little too brutal for me.
-    Dir.chdir(File.join(File.dirname(__FILE__), 'fixtures')) do
-      system 'mysql -u root dm_sphinx_adapter_test < item.sql' \
-        or raise %q{Tests require the dm_sphinx_adapter_test.items table.}
-    end
-  end
-
+class TestClient < TestAdapter
   def test_initialize
-    assert_nothing_raised do
-      DataMapper::SphinxClient.new(@config)
-    end
+    assert_nothing_raised { DataMapper::SphinxClient.new(@config) }
   end
 
   def test_index
@@ -26,16 +14,16 @@ class TestClient < Test::Unit::TestCase
   end
 
   def test_managed_initialize
-    assert_nothing_raised do
-      DataMapper::SphinxManagedClient.new(@config)
-    end
+    assert_nothing_raised { DataMapper::SphinxManagedClient.new(@config) }
   end
 
   def test_search
     begin
       client = DataMapper::SphinxManagedClient.new(@config)
       client.index
-      assert client.search('foo')
+      assert match = client.search('two')
+      assert_equal 1, match[:total]
+      assert_equal 2, match[:matches][0][:doc]
     ensure
       client.stop
     end
