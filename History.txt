@@ -1,3 +1,8 @@
+=== 0.4 / 2008-11-21
+
+  * Fixed broken dm-is-searchable support.
+  * Bumped version because the read_one/read_many result structure had to change to support dm-is-searchable.
+
 === 0.3 / 2008-11-18
 
   * Removed calls to indexer on create/update. See README.txt
