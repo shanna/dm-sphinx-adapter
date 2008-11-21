@@ -1,23 +1,34 @@
 = DataMapper Sphinx Adapter
 
-A Sphinx DataMapper adapter.
+* http://rubyforge.org/projects/dm-sphinx/
+* http://github.com/shanna/dm-sphinx-adapter/tree/master
+
+== Description
+
+A DataMapper Sphinx adapter.
+
+== Dependencies
+
+* dm-core           ~> 0.9.7
+* riddle            ~> 0.9
+* daemon_controller ~> 0.2   (optional)
+* dm-is-searchable  ~> 0.9.7 (optional)
+
+I'd recommend using the dm-more plugin dm-is-searchable instead of fetching the document id's yourself.
+
+== Install
+
+* Via git: git clone git://github.com/shanna/iso-country-codes.git
+* Via gem: gem install shanna-dm-sphinx-adapter -s http://gems.github.com
 
 == Synopsis
 
 DataMapper uses URIs or a connection has to connect to your data-stores. In this case the sphinx search daemon
 <tt>searchd</tt>.
 
-On its own this adapter will only return an array of document IDs when queried. The dm-more source (not the gem)
+On its own this adapter will only return an array of document hashes when queried. The DataMapper library dm-more
 however provides dm-is-searchable, a common interface to search one adapter and load documents from another. My
-suggestion is to use this adapter in tandem with dm-is-searchable.
-
-The dm-is-searchable plugin is part of dm-more though unfortunately isn't built and bundled with dm-more gem.
-You'll need to checkout the dm-more source with Git from git://github.com/sam/dm-more.git and build/install the
-gem yourself.
-
-  git clone git://github.com/sam/dm-more.git
-  cd dm-more/dm-is-searchable
-  sudo rake install_gem
+preference is to use this adapter in tandem with dm-is-searchable.
 
 Like all DataMapper adapters you can connect with a Hash or URI.
 
@@ -135,7 +146,7 @@ and sort, include or exclude by attributes defined in your sphinx configuration:
   # Search 'items, items_delta' index for '@name barney' updated in the last 30 minutes.
   Item.search(:name => 'barney', :updated => (Time.now - 1800 .. Time.now))
 
-== Sphinx Configuration.
+== Sphinx Configuration
 
 Though you don't have to supply the sphinx configuration file to dm-sphinx-adapter I'd recommend doing it anyway.
 It's more DRY since all searchd/indexer options can be read straight from the configuration.
@@ -173,20 +184,12 @@ an endless loop, with a few seconds of sleep in between to allow searchd some he
 
 == Todo
 
-* Tests. Clearly I only test what I see as important or broken which drives TDD people crazy sometimes :)
 * Loads of documentation. Most of it is unchecked YARD at the moment.
 * Add DataMapper::SphinxClient#attribute_set to allow attribute modification on one or more indexes. It's the only
   thing missing if you understand the pitfalls and still want to add thinking-sphinx like delta indexing to your
   resource.
 
-== Dependencies
-
-dm-core and riddle are technically the only requirements though I'd recommend using the dm-more plugin dm-is-searchable
-instead of fetching the document id's yourself.
-
-Unfortunately dm-is-searchable isn't installed even when you build the dm-more gem from github master. You'll need to
-build and install the gem yourself from source.
-
 == Contributing
 
 Go nuts. Just send me a pull request (github or otherwise) when you are happy with your code.
+
