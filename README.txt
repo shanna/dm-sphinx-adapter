@@ -166,7 +166,7 @@ or whatever in production. Use the Hash form of DataMapper#setup and supply the 
 daemon_controller will start searchd on demand.
 
 It is already strongly encouraged but you will need to specify the path to your sphinx configuration file in order for
-searchd to run. See Sphinx Configuration, DataMapper::SphinxManagedClient.
+searchd to run. See Sphinx Configuration, DataMapper::Adapters::Sphinx::ManagedClient.
 
 The daemon_controller library can be found only on github, not rubyforge.
 See http://github.com/FooBarWidget/daemon_controller/tree/master
@@ -185,9 +185,9 @@ an endless loop, with a few seconds of sleep in between to allow searchd some he
 == Todo
 
 * Loads of documentation. Most of it is unchecked YARD at the moment.
-* Add DataMapper::SphinxClient#attribute_set to allow attribute modification on one or more indexes. It's the only
-  thing missing if you understand the pitfalls and still want to add thinking-sphinx like delta indexing to your
-  resource.
+* Add DataMapper::Adapters::Sphinx::Client#attribute_set to allow attribute modification on one or more indexes. It's
+  the only thing missing if you understand the pitfalls and still want to add thinking-sphinx like delta indexing to
+  your resource.
 
 == Contributing
 
