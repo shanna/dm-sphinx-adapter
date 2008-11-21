@@ -2,11 +2,11 @@ require 'test_adapter'
 
 class TestClient < TestAdapter
   def test_initialize
-    assert_nothing_raised { DataMapper::SphinxClient.new(@config) }
+    assert_nothing_raised { DataMapper::Adapters::Sphinx::Client.new(@config) }
   end
 
   def test_index
-    client = DataMapper::SphinxClient.new(@config)
+    client = DataMapper::Adapters::Sphinx::Client.new(@config)
     assert_nothing_raised{ client.index }
     assert_nothing_raised{ client.index 'items' }
     assert_nothing_raised{ client.index '*' }
@@ -14,12 +14,12 @@ class TestClient < TestAdapter
   end
 
   def test_managed_initialize
-    assert_nothing_raised { DataMapper::SphinxManagedClient.new(@config) }
+    assert_nothing_raised { DataMapper::Adapters::Sphinx::ManagedClient.new(@config) }
   end
 
   def test_search
     begin
-      client = DataMapper::SphinxManagedClient.new(@config)
+      client = DataMapper::Adapters::Sphinx::ManagedClient.new(@config)
       client.index
       assert match = client.search('two')
       assert_equal 1, match[:total]

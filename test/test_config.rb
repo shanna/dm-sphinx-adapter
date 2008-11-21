@@ -36,6 +36,6 @@ class TestConfig < Test::Unit::TestCase
 
   protected
     def config_new(options = {:config => @config})
-      DataMapper::SphinxConfig.new(options)
+      DataMapper::Adapters::Sphinx::Config.new(options)
     end
 end # TestConfig
