@@ -1,50 +1,30 @@
-require 'strscan'
-require 'pathname'
+require 'rubygems'
 
-# TODO: Error classes.
-# TODO: Just warn if a config file can't be found.
+gem 'extlib', '~> 0.9.7'
+require 'extlib'
 
 module DataMapper
   module Adapters
     module Sphinx
       class Config
+        include Extlib::Assertions
+        attr_reader :config, :address, :log, :port
 
         ##
         # Read a sphinx configuration file.
         #
-        # This class just gives you access to handy searchd {} configuration options. It does not validate your
-        # configuration file beyond basic syntax checking.
-        def initialize(uri_or_options = {})
-          @config  = []
-          @searchd = {
-            'address'         => '0.0.0.0',
-            'log'             => 'searchd.log',
-            'max_children'    => 0,
-            'max_matches'     => 1000,
-            'pid_file'        => nil,
-            'port'            => 3312,
-            'preopen_indexes' => 0,
-            'query_log'       => '',
-            'read_timeout'    => 5,
-            'seamless_rotate' => 1,
-            'unlink_old'      => 1
-          }
-
-          path = case uri_or_options
-            when Addressable::URI, DataObjects::URI then uri_or_options.path
-            when Hash                               then uri_or_options[:config] || uri_or_options[:database]
-            when Pathname                           then uri_or_options
-            when String                             then DataObjects::URI.parse(uri_or_options).path
-          end
-          parse('' + path.to_s) # Force stringy since Pathname#to_s is broken IMO.
-        end
-
-        ##
-        # Configuration file full path name.
+        # This class just gives you access to handy searchd {} configuration options.
         #
-        # @return [String]
-        def config
-          @config
+        # @see http://www.sphinxsearch.com/doc.html#confgroup-searchd
+        def initialize(uri_or_options = {})
+          assert_kind_of 'uri_or_options', uri_or_options, Addressable::URI, DataObjects::URI, Hash, String, Pathname
+
+          options   = normalize_options(uri_or_options)
+          config    = parse_config("#{options[:path]}") # Pathname#to_s is broken?
+          @address  = options[:host]     || config['address']  || '0.0.0.0'
+          @port     = options[:port]     || config['port']     || 3312
+          @log      = options[:log]      || config['log']      || 'searchd.log'
+          @pid_file = options[:pid_file] || config['pid_file']
         end
 
         ##
@@ -56,109 +36,37 @@ module DataMapper
         end
 
         ##
-        # Searchd binardy full path name and config argument.
+        # Searchd binary full path name and config argument.
         def searchd_bin(use_config = true)
           path = 'searchd' # TODO: Real.
           path << " --config #{config}" if config
           path
         end
 
-        ##
-        # Searchd address.
-        def address
-          searchd['address']
-        end
-
-        ##
-        # Searchd port.
-        def port
-          searchd['port']
-        end
-
-        ##
-        # Searchd pid_file.
         def pid_file
-          searchd['pid_file'] or raise "Mandatory pid_file option missing from searchd configuration."
-        end
-
-        ##
-        # Searchd log file.
-        def log
-          searchd['log']
-        end
-
-        ##
-        # Searchd configuration options.
-        #
-        # @see http://www.sphinxsearch.com/doc.html#confgroup-searchd
-        def searchd
-          @searchd
+          @pid_file or raise "Mandatory pid_file option missing from searchd configuration."
         end
 
         protected
-
-          ##
-          # Parse a sphinx config file.
-          #
-          # @param [String] path Searches path, ./path, /path, /usr/local/etc/sphinx.conf, ./sphinx.conf in that order.
-          def parse(path = '')
-            # TODO: Three discrete things going on here, should be three subs.
-            paths = [
-              path,
-              path.gsub(%r{^/}, './'),
-              path.gsub(%r{^\./}, '/'),
-              '/usr/local/etc/sphinx.conf', # TODO: Does this one depend on where searchd/indexer is installed?
-              './sphinx.conf'
-            ]
-            paths.find do |path|
-              @config = Pathname.new(path).expand_path
-              @config.readable? && `#{indexer_bin}` !~ /fatal|error/i
-            end or raise IOError, %{No readable config file (looked in #{paths.join(', ')})}
-
-            source = config.read
-            source.gsub!(/\r\n|\r|\n/, "\n") # Everything in \n
-            source.gsub!(/\s*\\\n\s*/, ' ')  # Remove unixy line wraps.
-            @in = StringScanner.new(source)
-            blocks(blocks = [])
-            @in = nil
-
-            searchd = blocks.find{|c| c['type'] =~ /searchd/i} || {}
-            @searchd.update(searchd)
-          end
-
-        private
-
-          # TODO: Move all the parsing code into ::ConfigParser.
-
-          def blocks(out = []) #:nodoc:
-            if @in.scan(/\#[^\n]*\n/) || @in.scan(/\s+/)
-              blocks(out)
-            elsif @in.scan(/indexer|searchd|source|index/i)
-              out << group = {'type' => @in.matched}
-              if @in.matched =~ /^(?:index|source)$/i
-                @in.scan(/\s* ([\w_\-]+) (?:\s*:\s*([\w_\-]+))? \s*/x) or raise "Expected #{group[:type]} name."
-                group['name']     = @in[1]
-                group['ancestor'] = @in[2]
-              end
-              @in.scan(/\s*\{/) or raise %q{Expected '\{'.}
-              pairs(kv = {})
-              group.merge!(kv)
-              @in.scan(/\s*\}/) or raise %q{Expected '\}'.}
-              blocks(out)
-            else
-              raise "Unknown near: #{@in.peek(30)}" unless @in.eos?
+          def normalize_options(uri_or_options)
+            case uri_or_options
+              when String, Addressable::URI then DataObjects::URI.parse(uri_or_options).attributes
+              when DataObjects::URI         then uri_or_options.attributes
+              when Pathname                 then {:path => uri_or_options}
+              else
+                uri_or_options[:path] ||= uri_or_options.delete(:config) || uri_or_options.delete(:database)
+                uri_or_options
             end
           end
 
-          def pairs(out = {}) #:nodoc:
-            if @in.scan(/\#[^\n]*\n/) || @in.scan(/\s+/)
-              pairs(out)
-            elsif @in.scan(/[\w_-]+/)
-              key = @in.matched
-              @in.scan(/\s*=/) or raise %q{Expected '='.}
-              out[key] = @in.scan(/[^\n]*\n/).strip
-              pairs(out)
-            end
+          def parse_config(path)
+            paths = []
+            paths.push(path, path.gsub(%r{^/}, './'), path.gsub(%r{^\./}, '/')) unless path.blank?
+            paths.push('/usr/local/etc/sphinx.conf', './sphinx.conf')
+            paths.map!{|path| Pathname.new(path).expand_path}
+
+            @config = paths.find{|path| path.readable? && `#{indexer_bin} --config #{path}` !~ /fatal|error/i}
+            @config ? ConfigParser.parse(@config) : {}
           end
       end # Config
     end # Sphinx

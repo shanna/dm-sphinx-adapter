@@ -9,33 +9,67 @@ class TestConfig < Test::Unit::TestCase
   end
 
   def test_initialize
-    assert_nothing_raised{ config_new }
-    assert_raise(IOError){ config_new(:config => nil) }
-    assert_raise(IOError){ config_new(:config => 'blah') }
-    assert_raise(IOError){ config_new(:config => @log) }
+    assert_nothing_raised{ config }
+    assert_nothing_raised{ config({}) }
+    assert_nothing_raised{ config(:config => nil) }
+    assert_nothing_raised{ config(:config => 'blah') }
+    assert_nothing_raised{ config(:config => @log) }
   end
 
-  def test_initalize_forms
-    assert_nothing_raised{ config_new(:database => @config) }
-    # TODO: DataObjects::URI treats /test as the hostname.
-    # assert_nothing_raised{ config_new('file://test/data/sphinx.conf') }
-    assert_nothing_raised{ config_new('sphinx://localhost/test/files/sphinx.conf') }
+  def test_initalize_defaults
+    assert c = config({})
+    assert_equal '0.0.0.0', c.address
+    assert_equal 3312, c.port
+    assert_equal 'searchd.log', c.log
+    assert_raise(RuntimeError){ c.pid_file }
+    assert_nil c.config
   end
 
-  def test_config
-    assert_equal @config, config_new.config
+  def test_initalize_options_hash
+    assert c = config(
+      :host     => 'options',
+      :port     => 1234,
+      :log      => 'log.log',
+      :pid_file => 'pid.pid'
+    )
+
+    assert_equal 'options', c.address
+    assert_equal 1234, c.port
+    assert_equal 'log.log', c.log
+    assert_equal 'pid.pid', c.pid_file
+    assert_nil c.config
   end
 
-  def test_searchd
-    assert_kind_of Hash,                config_new.searchd
-    assert_equal 'localhost',           config_new.address
-    assert_equal '3312',                config_new.port
-    assert_equal 'test/var/sphinx.pid', config_new.pid_file
-    assert_equal 'test/var/sphinx.log', config_new.log
+  def test_initialize_options_string
+    assert c = config("sphinx://options:1234")
+    assert_equal 'options', c.address
+    assert_equal 1234, c.port
+    assert_equal 'searchd.log', c.log
+    assert_raise(RuntimeError){ c.pid_file }
+    assert_nil c.config
+  end
+
+  def test_initialize_config
+    assert c = config(:config => @config)
+    assert_equal 'localhost', c.address
+    assert_equal '3312', c.port
+    assert_equal 'test/var/sphinx.log', c.log
+    assert_equal 'test/var/sphinx.pid', c.pid_file
+    assert_equal @config, c.config
+  end
+
+  def test_initialize_database_hash
+    assert c = config(:database => @config)
+    assert_equal @config, c.config
+  end
+
+  def test_initialize_database_string
+    assert c = config("sphinx://localhost/test/files/sphinx.conf")
+    assert_equal @config, c.config
   end
 
   protected
-    def config_new(options = {:config => @config})
+    def config(options = {:config => @config})
       DataMapper::Adapters::Sphinx::Config.new(options)
     end
 end # TestConfig

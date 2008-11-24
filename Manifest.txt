@@ -9,6 +9,7 @@ lib/dm-sphinx-adapter/adapter.rb
 lib/dm-sphinx-adapter/attribute.rb
 lib/dm-sphinx-adapter/client.rb
 lib/dm-sphinx-adapter/config.rb
+lib/dm-sphinx-adapter/config_parser.rb
 lib/dm-sphinx-adapter/index.rb
 lib/dm-sphinx-adapter/resource.rb
 test/files/dm_sphinx_adapter_test.sql
@@ -25,5 +26,6 @@ test/test_adapter_searchable.rb
 test/test_adapter_vanilla.rb
 test/test_client.rb
 test/test_config.rb
+test/test_config_parser.rb
 test/test_type_attribute.rb
 test/test_type_index.rb

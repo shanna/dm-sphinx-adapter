@@ -19,7 +19,13 @@ class TestAdapter < Test::Unit::TestCase
     sleep 1
   end
 
-  def test_setup
+  def test_unmanaged_setup
+    assert DataMapper.setup(:sphinx, :adapter => 'sphinx')
+    assert_kind_of DataMapper::Adapters::SphinxAdapter, repository(:sphinx).adapter
+    assert_kind_of DataMapper::Adapters::Sphinx::Client, repository(:sphinx).adapter.client
+  end
+
+  def test_managed_setup
     assert DataMapper.setup(:sphinx, :adapter => 'sphinx', :config => @config, :managed => true)
     assert_kind_of DataMapper::Adapters::SphinxAdapter, repository(:sphinx).adapter
     assert_kind_of DataMapper::Adapters::Sphinx::ManagedClient, repository(:sphinx).adapter.client

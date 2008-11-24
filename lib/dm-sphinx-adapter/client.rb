@@ -7,8 +7,9 @@ module DataMapper
   module Adapters
     module Sphinx
       class Client
-        def initialize(uri_or_options)
-          # TODO: Documentation.
+        include Extlib::Assertions
+
+        def initialize(uri_or_options = {})
           @config = Sphinx::Config.new(uri_or_options)
         end
 
@@ -57,7 +58,7 @@ module DataMapper
       # Requires you have daemon_controller installed.
       # @see http://github.com/FooBarWidget/daemon_controller/tree/master
       class ManagedClient < Client
-        def initialize(url_or_options)
+        def initialize(url_or_options = {})
           super
 
           # Fire up searchd.
