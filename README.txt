@@ -27,9 +27,10 @@ I'd recommend using the dm-more plugin dm-is-searchable instead of fetching the 
 DataMapper uses URIs or a connection has to connect to your data-stores. In this case the sphinx search daemon
 <tt>searchd</tt>.
 
-On its own this adapter will only return an array of document hashes when queried. The DataMapper library dm-more
-however provides dm-is-searchable, a common interface to search one adapter and load documents from another. My
-preference is to use this adapter in tandem with dm-is-searchable.
+On its own this adapter will only return an array of document hashes when queried. The DataMapper library
+<tt>dm-is-searchable</tt> however provides a common interface to search one adapter and load documents from another. My
+preference is to use this adapter in tandem with <tt>dm-is-searchable</tt>. See further examples in the synopsis for
+usage with <tt>dm-is-searchable</tt>.
 
 Like all DataMapper adapters you can connect with a Hash or URI.
 
@@ -76,14 +77,16 @@ Alternatively supply a Hash:
 IsSearchable is a DataMapper plugin that provides a common search interface when searching from one adapter and reading
 documents from another.
 
-IsSearchable will read resources from your +:default+ repository on behalf of a search adapter such as
-+dm-sphinx-adapter+ and +dm-ferret-adapter+. This saves some of the grunt work (as shown in the previous example) by
-mapping the resulting document id's from a search with your +:search+ adapter into a suitable #first or #all query for
-your +:default+ repository.
+IsSearchable will read resources from your <tt>:default</tt> repository on behalf of a search adapter such as
+<tt>dm-sphinx-adapter</tt> and <tt>dm-ferret-adapter</tt>. This saves some of the grunt work (as shown in the previous
+example) by mapping the resulting document id's from a search with your <tt>:search</tt> adapter into a suitable
+<tt>#first</tt> or <tt>#all</tt> query for your <tt>:default</tt> repository.
 
-IsSearchable adds a single class method to your resource. The first argument is a +Hash+ of DataMapper::Query
-conditions to pass to your search adapter (in this case +dm-sphinx-adapter+). An optional second Hash of
-DataMapper::Query conditions can also be passed and will be appended to the query on your +:default+ database.
+IsSearchable adds a single class method to your resource. The first argument is a <tt>Hash</tt> of
+<tt>DataMapper::Query</tt> conditions to pass to your search adapter (in this case <tt>dm-sphinx-adapter</tt>). An
+optional second <tt>Hash</tt> of <tt>DataMapper::Query</tt> conditions can also be passed and will be appended to the
+query on your <tt>:default</tt> database. This can be handy if you need to add extra exclusions that aren't possible
+using <tt>dm-sphinx-adapter</tt> such as <tt>#gt</tt> or <tt>#lt</tt> conditions.
 
   require 'rubygems'
   require 'dm-core'
@@ -197,7 +200,6 @@ an endless loop, with a few seconds of sleep in between to allow searchd some he
 
 == Todo
 
-* Loads of documentation. Most of it is unchecked YARD at the moment.
 * Add DataMapper::Adapters::Sphinx::Client#attribute_set to allow attribute modification on one or more indexes. It's
   the only thing missing if you understand the pitfalls and still want to add thinking-sphinx like delta indexing to
   your resource.
