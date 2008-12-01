@@ -1,6 +1,7 @@
 = DataMapper Sphinx Adapter
 
-* http://rubyforge.org/projects/dm-sphinx/
+* http://dm-sphinx.rubyforge.org
+* http://rubyforge.org/projects/dm-sphinx
 * http://github.com/shanna/dm-sphinx-adapter/tree/master
 
 == Description
@@ -70,7 +71,19 @@ Alternatively supply a Hash:
   ids   = docs.map{|doc| doc[:id]}
   items = Item.all(:id => ids) # Search :default for all the document id's returned by sphinx.
 
-=== DataMapper and Is Searchable
+=== DataMapper and IsSearchable
+
+IsSearchable is a DataMapper plugin that provides a common search interface when searching from one adapter and reading
+documents from another.
+
+IsSearchable will read resources from your +:default+ repository on behalf of a search adapter such as
++dm-sphinx-adapter+ and +dm-ferret-adapter+. This saves some of the grunt work (as shown in the previous example) by
+mapping the resulting document id's from a search with your +:search+ adapter into a suitable #first or #all query for
+your +:default+ repository.
+
+IsSearchable adds a single class method to your resource. The first argument is a +Hash+ of DataMapper::Query
+conditions to pass to your search adapter (in this case +dm-sphinx-adapter+). An optional second Hash of
+DataMapper::Query conditions can also be passed and will be appended to the query on your +:default+ database.
 
   require 'rubygems'
   require 'dm-core'
@@ -93,7 +106,7 @@ Alternatively supply a Hash:
   # Fire up your sphinx search daemon and start searching.
   items = Item.search(:name => 'barney') # Search 'items' index for '@name barney'
 
-=== Merb, DataMapper and Is Searchable
+=== Merb, DataMapper and IsSearchable
 
   # config/init.rb
   dependency 'dm-is-searchable'
@@ -121,7 +134,7 @@ Alternatively supply a Hash:
   # Fire up your sphinx search daemon and start searching.
   Item.search(:name => 'barney') # Search 'items' index for '@name barney'
 
-=== DataMapper::SphinxResource
+=== DataMapper, IsSearchable and DataMapper::SphinxResource
 
 For finer grained control you can include DataMapper::SphinxResource. For instance you can search one or more indexes
 and sort, include or exclude by attributes defined in your sphinx configuration:
