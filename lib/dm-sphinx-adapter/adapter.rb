@@ -1,7 +1,5 @@
 require 'benchmark'
 
-# TODO: I think perhaps I should move all the query building code to a lib of its own.
-
 module DataMapper
   module Adapters
     module Sphinx
@@ -35,12 +33,14 @@ module DataMapper
       #     :managed  => true            # optional. Self managed searchd server using daemon_controller.
       #   })
       class Adapter < AbstractAdapter
-        ##
-        # Initialize the sphinx adapter.
+
+        # ==== See
+        # * DataMapper::Adapters::Sphinx::Config
+        # * DataMapper::Adapters::Sphinx::Client
         #
-        # @param [URI, DataObject::URI, Addressable::URI, String, Hash, Pathname] uri_or_options
-        # @see   DataMapper::Adapters::Sphinx::Config
-        # @see   DataMapper::Adapters::Sphinx::Client
+        # ==== Parameters
+        # uri_or_options<URI, DataObject::URI, Addressable::URI, String, Hash, Pathname>::
+        #   DataMapper uri or options hash.
         def initialize(name, uri_or_options)
           super
 
@@ -48,11 +48,14 @@ module DataMapper
           @client  = managed ? ManagedClient.new(uri_or_options) : Client.new(uri_or_options)
         end
 
-        ##
         # Interaction with searchd and indexer.
         #
-        # @see DataMapper::Adapters::Sphinx::Client
-        # @see DataMapper::Adapters::Sphinx::ManagedClient
+        # ==== See
+        # * DataMapper::Adapters::Sphinx::Client
+        # * DataMapper::Adapters::Sphinx::ManagedClient
+        #
+        # ==== Returns
+        # DataMapper::Adapters::Sphinx::Client:: The client.
         attr_reader :client
 
         def create(resources) #:nodoc:
@@ -63,21 +66,54 @@ module DataMapper
           true
         end
 
+        # Query your Sphinx repository and return all matching documents.
+        #
+        # ==== Notes
+        #
+        # These methods are public but normally called indirectly through DataMapper::Resource#get,
+        # DataMapper::Resource#first or DataMapper::Resource#all.
+        #
+        # ==== Parameters
+        # query<DataMapper::Query>:: The query object.
+        #
+        # ==== Returns
+        # Array<Hash>:: An array of document hashes. <tt>[{:id => 1}, {:id => 2}]</tt>
+        # Array<>::     An empty array if no documents match.
         def read_many(query)
           read(query)
         end
 
+        # Query your Sphinx repository and return the first document matched.
+        #
+        # ==== Notes
+        #
+        # These methods are public but normally called indirectly through DataMapper::Resource#get,
+        # DataMapper::Resource#first or DataMapper::Resource#all.
+        #
+        # ==== Parameters
+        # query<DataMapper::Query>:: The query object.
+        #
+        # ==== Returns
+        # Hash:: An document hash of the first document matched. <tt>{:id => 1}</tt>
+        # Nil::  If no documents match.
         def read_one(query)
           read(query).first
         end
 
         protected
-          ##
           # List sphinx indexes to search.
+          #
           # If no indexes are explicitly declared using DataMapper::Adapters::Sphinx::Resource then the default storage
           # name is used.
           #
-          # @see DataMapper::Adapters::Sphinx::Resource#sphinx_indexes
+          # ==== See
+          # * DataMapper::Adapters::Sphinx::Resource::ClassMethods#sphinx_indexes
+          #
+          # ==== Parameters
+          # model<DataMapper::Model>:: The DataMapper::Model.
+          #
+          # ==== Returns
+          # Array<DataMapper::Adapters::Sphinx::Index>:: Index objects from the model.
           def indexes(model)
             indexes = model.sphinx_indexes(repository(self.name).name) if model.respond_to?(:sphinx_indexes)
             if indexes.nil? or indexes.empty?
@@ -86,23 +122,33 @@ module DataMapper
             indexes
           end
 
-          ##
           # List sphinx delta indexes to search.
           #
-          # @see DataMapper::Adapters::Sphinx::Resource#sphinx_indexes
+          # ==== See
+          # * DataMapper::Adapters::Sphinx::Resource::ClassMethods#sphinx_indexes
+          #
+          # ==== Parameters
+          # model<DataMapper::Model>:: The DataMapper::Model.
+          #
+          # ==== Returns
+          # Array<DataMapper::Adapters::Sphinx::Index>:: Index objects from the model.
           def delta_indexes(model)
             indexes(model).find_all{|i| i.delta?}
           end
 
-          ##
           # Query sphinx for a list of document IDs.
           #
-          # @param [DataMapper::Query]
+          # ==== Parameters
+          # query<DataMapper::Query>:: The query object.
+          #
+          # ==== Returns
+          # Array<Hash>:: An array of document hashes. <tt>[{:id => 1}, {:id => 2}]</tt>
+          # Array<>::     An empty array if no documents match.
           def read(query)
             from    = indexes(query.model).map{|index| index.name}.join(', ')
             search  = Sphinx::Query.new(query).to_s
             options = {
-              :match_mode => :extended, # TODO: Modes!
+              :match_mode => :extended,
               :filters    => search_filters(query) # By attribute.
             }
             options[:limit]  = query.limit.to_i  if query.limit
@@ -125,15 +171,11 @@ module DataMapper
           end
 
 
-          ##
-          # Sphinx search query filters from attributes.
-          # @param  [DataMapper::Query]
-          # @return [Array]
-          def search_filters(query)
+          # Riddle search filters for attributes.
+          def search_filters(query) #:nodoc:
             filters = []
             query.conditions.each do |operator, attribute, value|
               next unless attribute.kind_of? Sphinx::Attribute
-              # TODO: Value cast to uint, bool, str2ordinal, float
               filters << case operator
                 when :eql, :like then Riddle::Client::Filter.new(attribute.name.to_s, filter_value(value))
                 when :not        then Riddle::Client::Filter.new(attribute.name.to_s, filter_value(value), true)
@@ -143,14 +185,10 @@ module DataMapper
             filters
           end
 
-          ##
-          # Order by attributes.
-          #
-          # @return [String or Symbol]
-          def search_order(query)
+          # TODO: How do you tell the difference between the default query order and someone explicitly asking for
+          # sorting by the primary key? I don't think you can at the moment.
+          def search_order(query) #:nodoc:
             by = []
-            # TODO: How do you tell the difference between the default query order and someone explicitly asking for
-            # sorting by the primary key?
             query.order.each do |order|
               next unless order.property.kind_of? Sphinx::Attribute
               by << [order.property.field, order.direction].join(' ')
@@ -160,7 +198,7 @@ module DataMapper
 
           # TODO: Move this to Attribute#dump.
           # This is ninja'd straight from TS just to get things going.
-          def filter_value(value)
+          def filter_value(value) #:nodoc:
             case value
               when Range
                 value.first.is_a?(Time) ? value.first.to_i..value.last.to_i : value

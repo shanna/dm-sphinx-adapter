@@ -12,12 +12,16 @@ module DataMapper
       module ConfigParser
         extend Extlib::Assertions
 
-        ##
         # Parse a sphinx config file and return searchd options as a hash.
         #
-        # @param  [String] path Searches path, ./#{path}, /#{path}, /usr/local/etc/sphinx.conf, ./sphinx.conf in
-        # that order.
-        # @return [Hash]
+        # ==== Raises
+        # RuntimeError:: On parsing errors.
+        #
+        # ==== Parameters
+        # path<String>:: Sphinx configuration file.
+        #
+        # ==== Returns
+        # Hash:: Searchd options.
         def self.parse(path)
           assert_kind_of 'path', path, Pathname, String
 

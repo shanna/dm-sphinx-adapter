@@ -2,8 +2,7 @@ module DataMapper
   module Adapters
     module Sphinx
 
-      ##
-      # Declare Sphinx indexes in your resource.
+      # Declare Sphinx indexes and attributes in your resource.
       #
       #   model Items
       #     include DataMapper::SphinxResource
@@ -35,15 +34,17 @@ module DataMapper
             model.instance_variable_set(:@sphinx_attributes, {})
           end
 
-          ##
           # Defines a sphinx index on the resource.
           #
           # Indexes are naturally ordered, with delta indexes at the end of the list so that duplicate document IDs in
           # delta indexes override your main indexes.
           #
-          # @param [Symbol] name the name of a sphinx index to search for this resource
-          # @param [Hash(Symbol => String)] options a hash of available options
-          # @see   DataMapper::Adapters::Sphinx::Index
+          # ==== See
+          # * DataMapper::Adapters::Sphinx::Index
+          #
+          # ==== Parameters
+          # name<Symbol>:: The name of a sphinx index to search for this resource.
+          # options<Hash>:: A hash of available index options.
           def index(name, options = {})
             index   = Index.new(self, name, options)
             indexes = sphinx_indexes(repository_name)
@@ -58,19 +59,23 @@ module DataMapper
             index
           end
 
-          ##
           # List of declared sphinx indexes for this model.
+          #
+          # ==== Returns
+          # Array<DataMapper::Adapters::Sphinx::Index>
           def sphinx_indexes(repository_name = default_repository_name)
             @sphinx_indexes[repository_name] ||= []
           end
 
-          ##
           # Defines a sphinx attribute on the resource.
           #
-          # @param [Symbol] name the name of a sphinx attribute to order/restrict by for this resource
-          # @param [Class] type the type to define this attribute as
-          # @param [Hash(Symbol => String)] options a hash of available options
-          # @see   DataMapper::Adapters::Sphinx::Attribute
+          # ==== See
+          # DataMapper::Adapters::Sphinx::Attribute
+          #
+          # ==== Parameters
+          # name<Symbol>:: The name of a sphinx attribute to order/restrict by for this resource.
+          # type<Class>:: The type to define this attribute as.
+          # options<Hash>:: An optional hash of attribute options.
           def attribute(name, type, options = {})
             # Attributes are just properties without a getter/setter in the model.
             # This keeps DataMapper::Query happy when building queries.
@@ -79,8 +84,10 @@ module DataMapper
             attribute
           end
 
-          ##
           # List of declared sphinx attributes for this model.
+          #
+          # ==== Returns
+          # Array<DataMapper::Adapters::Sphinx::Attribute>
           def sphinx_attributes(repository_name = default_repository_name)
             properties(repository_name).grep{|p| p.kind_of? Sphinx::Attribute}
           end

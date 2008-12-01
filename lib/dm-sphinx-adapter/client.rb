@@ -6,18 +6,32 @@ require 'riddle'
 module DataMapper
   module Adapters
     module Sphinx
+      # Client wrapper for Riddle::Client.
+      #
+      # * Simple interface to +searchd+ *and* +indexer+.
+      # * Can read +searchd+ configuration options from your sphinx configuration file.
+      # * Managed +searchd+ using +daemon_controller+ for on demand daemon control in development.
       class Client
+
+        # ==== Parameters
+        # uri_or_options<URI, DataObject::URI, Addressable::URI, String, Hash, Pathname>::
+        #   DataMapper uri or options hash.
         def initialize(uri_or_options = {})
           @config = Sphinx::Config.new(uri_or_options)
         end
 
-        ##
         # Search one or more indexes.
         #
-        # @param [String] query The sphinx query string.
-        # @param [Array, String] indexes A string or array of indexes to search. Default is '*' (all).
-        # @param [Hash] options Any options you'd like to pass through to Riddle::Client.
-        # @see   Riddle::Client
+        # ==== See
+        # * Riddle::Client
+        #
+        # ==== Parameters
+        # query<String>:: A sphinx query string.
+        # indexes<Array, String>:: Indexes to search. Default is '*' all.
+        # options<Hash>:: Any attributes supported by the Riddle::Client.
+        #
+        # ==== Returns
+        # Hash:: Riddle::Client#query response struct.
         def search(query, indexes = '*', options = {})
           indexes = indexes.join(' ') if indexes.kind_of?(Array)
 
@@ -26,11 +40,11 @@ module DataMapper
           client.query(query, indexes.to_s)
         end
 
-        ##
         # Index one or more indexes.
         #
-        # @param [Array, String] indexes Defaults to --all if indexes is nil or '*'.
-        def index(indexes = nil, options = {})
+        # ==== Parameters
+        # indexes<Array, String>:: Indexes to index (and rotate). Defaults to --all if indexes is +nil+ or '*'.
+        def index(indexes = nil)
           indexes = indexes.join(' ') if indexes.kind_of?(Array)
 
           command = @config.indexer_bin
@@ -40,26 +54,32 @@ module DataMapper
         end
 
         protected
-
-          ##
-          # Is the client running.
+          # Is a +searchd+ daemon running on the configured address and port.
           #
-          # Tests the address and port set in the configuration file.
+          # ==== Notes
+          # This is a simple TCPSocket test. It may not be your +searchd+ deamon or even a +searchd+ daemon at all if
+          # your configuration is wrong or another +searchd+ daemon is listen on that port already.
+          #
+          # ==== Returns
+          # Boolean
           def running?
             !!TCPSocket.new(@config.address, @config.port) rescue nil
           end
       end # Client
 
-      ##
       # Managed searchd if you don't already have god/monit doing the job for you.
       #
-      # Requires you have daemon_controller installed.
-      # @see http://github.com/FooBarWidget/daemon_controller/tree/master
+      # Requires you have +daemon_controller+ installed.
+      #
+      # ==== See
+      # * http://github.com/FooBarWidget/daemon_controller/tree/master
       class ManagedClient < Client
+
+        # ==== See
+        # * DataMapper::Adapters::Sphinx::Client#new
         def initialize(url_or_options = {})
           super
 
-          # Fire up searchd.
           require 'daemon_controller'
           @client = DaemonController.new(
             :identifier    => 'Sphinx searchd',
@@ -71,10 +91,15 @@ module DataMapper
           )
         end
 
+        # Start the +searchd+ daemon if it isn't already running then search.
+        #
+        # ==== See
+        # * DataMapper::Adapters::Sphinx::Client#search
         def search(*args)
           @client.connect{super}
         end
 
+        # Stop the +searchd+ daemon if it's running.
         def stop
           @client.stop if @client.running?
         end
