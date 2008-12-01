@@ -7,8 +7,6 @@ module DataMapper
   module Adapters
     module Sphinx
       class Client
-        include Extlib::Assertions
-
         def initialize(uri_or_options = {})
           @config = Sphinx::Config.new(uri_or_options)
         end

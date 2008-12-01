@@ -1,3 +1,10 @@
+=== 0.5 / 2008-12-01
+
+  * Moved sphinx extended query string generator into a class of its own.
+  * Improved generated extended query syntax and added tests.
+  * Support for sphinx "" phrase search operator (dm conditions as array).
+  * Support for sphinx | OR operator (dm conditions using {:field.in => %w{}}).
+
 === 0.4 / 2008-11-21
 
   * Fixed broken dm-is-searchable support.

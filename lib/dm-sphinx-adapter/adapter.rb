@@ -100,7 +100,7 @@ module DataMapper
           # @param [DataMapper::Query]
           def read(query)
             from    = indexes(query.model).map{|index| index.name}.join(', ')
-            search  = search_query(query)
+            search  = Sphinx::Query.new(query).to_s
             options = {
               :match_mode => :extended, # TODO: Modes!
               :filters    => search_filters(query) # By attribute.
@@ -124,41 +124,6 @@ module DataMapper
             res[:matches].map{|doc| {:id => doc[:doc]}}
           end
 
-          ##
-          # Sphinx search query string from properties (fields).
-          #
-          # If the query has no conditions an '' empty string will be generated possibly triggering Sphinx's full scan
-          # mode.
-          #
-          # @see    http://www.sphinxsearch.com/doc.html#searching
-          # @see    http://www.sphinxsearch.com/doc.html#conf-docinfo
-          # @param  [DataMapper::Query]
-          # @return [String]
-          def search_query(query)
-            match  = []
-
-            if query.conditions.empty?
-              match << ''
-            else
-              # TODO: This needs to be altered by match mode since not everything is supported in different match modes.
-              query.conditions.each do |operator, property, value|
-                next if property.kind_of? Sphinx::Attribute # Filters are added elsewhere.
-                # TODO: Why does my gem riddle differ from the vendor riddle that comes with ts?
-                # escaped_value = Riddle.escape(value)
-                escaped_value = value.to_s.gsub(/[\(\)\|\-!@~"&\/]/){|char| "\\#{char}"}
-                match << case operator
-                  when :eql, :like then "@#{property.field} #{escaped_value}"
-                  when :not        then "@#{property.field} -#{escaped_value}"
-                  when :lt, :gt, :lte, :gte
-                    DataMapper.logger.warn('Sphinx: Query properties with lt, gt, lte, gte are treated as .eql')
-                    "@#{name} #{escaped_value}"
-                  when :raw
-                    "#{property}"
-                end
-              end
-            end
-            match.join(' ')
-          end
 
           ##
           # Sphinx search query filters from attributes.
@@ -172,10 +137,7 @@ module DataMapper
               filters << case operator
                 when :eql, :like then Riddle::Client::Filter.new(attribute.name.to_s, filter_value(value))
                 when :not        then Riddle::Client::Filter.new(attribute.name.to_s, filter_value(value), true)
-                else
-                  error = "Sphinx: Query attributes do not support the #{operator} operator"
-                  DataMapper.logger.error(error)
-                  raise error # TODO: RuntimeError subclass and more information about the actual query.
+                else raise NotImplementedError.new("Sphinx: Query attributes do not support the #{operator} operator")
               end
             end
             filters
