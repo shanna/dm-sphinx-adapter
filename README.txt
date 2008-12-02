@@ -19,7 +19,7 @@ I'd recommend using the dm-more plugin dm-is-searchable instead of fetching the 
 
 == Install
 
-* Via git: git clone git://github.com/shanna/iso-country-codes.git
+* Via git: git clone git://github.com/shanna/dm-sphinx-adapter.git
 * Via gem: gem install shanna-dm-sphinx-adapter -s http://gems.github.com
 
 == Synopsis
