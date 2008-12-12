@@ -161,7 +161,11 @@ module DataMapper
               )
             end
 
-            res = @client.search(search, from, options)
+            indexes = indexes.join(' ') if indexes.kind_of?(Array)
+
+            client = Riddle::Client.new(@uri.host, @uri.port)
+            options.each{|k, v| client.method("#{k}=".to_sym).call(v) if client.respond_to?("#{k}=".to_sym)}
+            res = client.query(query, indexes.to_s)
             raise res[:error] unless res[:error].nil?
 
             DataMapper.logger.info(

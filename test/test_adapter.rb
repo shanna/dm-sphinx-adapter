@@ -1,17 +1,37 @@
 require File.join(File.dirname(__FILE__), 'helper')
 
 class TestAdapter < Test::Unit::TestCase
+  context 'DM::A::Sphinx::Adapter class' do
+    setup do
+      DataMapper.setup(:adapter, :adapter => 'sphinx', :config  => @config)
 
-  def test_unmanaged_setup
-    assert DataMapper.setup(:sphinx, :adapter => 'sphinx', :config => @config)
-    assert_kind_of DataMapper::Adapters::SphinxAdapter, repository(:sphinx).adapter
-    assert_kind_of DataMapper::Adapters::Sphinx::Client, repository(:sphinx).adapter.client
+      require File.join(File.dirname(__FILE__), 'files', 'model')
+      @it       = repository(:adapter)
+      @resource = Item
+    end
+
+    context '#create' do
+      should 'should return zero records created' do
+        assert_equal 0, @it.create(resource)
+      end
+    end
   end
 
-  def test_managed_setup
-    assert DataMapper.setup(:sphinx, :adapter => 'sphinx', :config => @config, :managed => true)
-    assert_kind_of DataMapper::Adapters::SphinxAdapter, repository(:sphinx).adapter
-    assert_kind_of DataMapper::Adapters::Sphinx::ManagedClient, repository(:sphinx).adapter.client
-  end
+  protected
+    def resource(options = {})
+      now = Time.now
+      attributes = {
+        :t_string   => now.to_s,
+        :t_text     => "text #{now.to_s}!",
+        :t_decimal  => now.to_i * 0.001,
+        :t_float    => now.to_i * 0.0001,
+        :t_integer  => now.to_i,
+        :t_datetime => now
+      }.update(options)
+      @resource.new(attributes)
+    end
 
-end # TestAdapter
+    def create_resource(options = {})
+      @resource.create(resource(options).attributes.except(:id))
+    end
+end

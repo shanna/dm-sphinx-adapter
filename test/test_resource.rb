@@ -1,15 +1,17 @@
 require File.join(File.dirname(__FILE__), 'helper')
-require 'files/resource_resource'
 
 class TestResource < Test::Unit::TestCase
-  def test_initialize
-    assert_nothing_raised{ Resource.new }
-  end
+  context 'DM::A::Sphinx::Resource module' do
+    setup do
+      class ::Resource
+        include DataMapper::SphinxResource
+      end
+    end
 
-  def test_search_properties
-    assert_equal Resource.all, Resource.search
-    assert_equal [Resource.first(:id => 2)], Resource.search(:t_string => 'two')
-    assert_equal [Resource.first(:id => 2)], Resource.search(:conditions => ['two'])
+    [:index, :sphinx_indexes, :attribute, :sphinx_attributes].each do |method|
+      should "respond to #{method}" do
+        assert_respond_to Resource, method
+      end
+    end
   end
-end # TestAdapterResource
-
+end

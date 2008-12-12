@@ -1,10 +1,5 @@
-require 'rubygems'
-require 'dm-is-searchable'
-
-class Explicit
-  include DataMapper::Resource
+class Item
   include DataMapper::SphinxResource
-
   property :id,         Serial
   property :t_string,   String
   property :t_text,     Text, :lazy => false
@@ -13,12 +8,8 @@ class Explicit
   property :t_integer,  Integer
   property :t_datetime, DateTime
 
-  is :searchable
   repository(:search) do
     properties(:search).clear
-    index     :items
-    index     :items_delta, :delta => true
-
     property :id,         Serial
     property :t_string,   String
 
@@ -28,8 +19,5 @@ class Explicit
     attribute :t_integer,  Integer
     attribute :t_datetime, DateTime
   end
+end # Item
 
-  def self.default_storage_name
-    'item'
-  end
-end # Explicit
