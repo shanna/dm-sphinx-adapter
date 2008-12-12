@@ -6,9 +6,12 @@ class Resource
   include DataMapper::SphinxResource
 
   property :id,         Serial
-  property :name,       String
-  property :likes,      Text, :lazy => false
-  property :updated_on, DateTime
+  property :t_string,   String
+  property :t_text,     Text, :lazy => false
+  property :t_decimal,  BigDecimal
+  property :t_float,    Float
+  property :t_integer,  Integer
+  property :t_datetime, DateTime
 
   is :searchable
 

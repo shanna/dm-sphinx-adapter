@@ -1,6 +1,6 @@
-require 'test_adapter'
+require File.join(File.dirname(__FILE__), 'helper')
 
-class TestClient < TestAdapter
+class TestClient < Test::Unit::TestCase
   def test_initialize
     assert_nothing_raised { DataMapper::Adapters::Sphinx::Client.new(@config) }
   end
@@ -21,6 +21,7 @@ class TestClient < TestAdapter
     begin
       client = DataMapper::Adapters::Sphinx::ManagedClient.new(@config)
       client.index
+      sleep 1
       assert match = client.search('two')
       assert_equal 1, match[:total]
       assert_equal 2, match[:matches][0][:doc]

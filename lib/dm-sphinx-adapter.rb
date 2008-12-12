@@ -5,15 +5,20 @@ $VERBOSE = nil
 gem 'dm-core', '~> 0.9.7'
 require 'dm-core'
 
-# TODO: I think I might move everything to DataMapper::Sphinx::* and ignore the default naming convention.
 require 'pathname'
-dir = Pathname(__FILE__).dirname.expand_path / 'dm-sphinx-adapter'
+lib = Pathname(__FILE__).dirname.expand_path
+dir = lib / 'dm-sphinx-adapter'
+
+# Bundled Riddle since the gem is very old and we don't need any of the config generation stuff.
+$:.unshift lib
+require 'riddle'
+
+# TODO: Require farms suck. Do something about it.
+require dir / 'adapter'
+require dir / 'attribute'
+require dir / 'client'
 require dir / 'config'
 require dir / 'config_parser'
-require dir / 'client'
-require dir / 'query'
-require dir / 'adapter'
 require dir / 'index'
-require dir / 'attribute'
+require dir / 'query'
 require dir / 'resource'
-

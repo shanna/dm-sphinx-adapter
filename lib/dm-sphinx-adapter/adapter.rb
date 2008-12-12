@@ -177,8 +177,8 @@ module DataMapper
             query.conditions.each do |operator, attribute, value|
               next unless attribute.kind_of? Sphinx::Attribute
               filters << case operator
-                when :eql, :like then Riddle::Client::Filter.new(attribute.name.to_s, filter_value(value))
-                when :not        then Riddle::Client::Filter.new(attribute.name.to_s, filter_value(value), true)
+                when :eql, :like then attribute.filter(value)
+                when :not        then attribute.filter(value, false)
                 else raise NotImplementedError.new("Sphinx: Query attributes do not support the #{operator} operator")
               end
             end
@@ -194,19 +194,6 @@ module DataMapper
               by << [order.property.field, order.direction].join(' ')
             end
             by.empty? ? nil : by.join(', ')
-          end
-
-          # TODO: Move this to Attribute#dump.
-          # This is ninja'd straight from TS just to get things going.
-          def filter_value(value) #:nodoc:
-            case value
-              when Range
-                value.first.is_a?(Time) ? value.first.to_i..value.last.to_i : value
-              when Array
-                value.collect { |val| val.is_a?(Time) ? val.to_i : val }
-              else
-                Array(value)
-            end
           end
       end # Adapter
     end # Sphinx

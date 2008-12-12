@@ -1,8 +1,3 @@
-require 'rubygems'
-
-gem 'riddle', '~> 0.9'
-require 'riddle'
-
 module DataMapper
   module Adapters
     module Sphinx

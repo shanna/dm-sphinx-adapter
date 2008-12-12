@@ -1,11 +1,9 @@
-require 'test/unit'
-require 'dm-sphinx-adapter'
+require File.join(File.dirname(__FILE__), 'helper')
 
 class TestConfig < Test::Unit::TestCase
   def setup
-    base    = Pathname(__FILE__).dirname.expand_path
-    @config = base / 'files' / 'sphinx.conf'
-    @log    = base / 'var' / 'sphinx.log'
+    @log = Pathname.new(__FILE__).dirname / 'var' / 'sphinx.log'
+    super
   end
 
   def test_initialize
