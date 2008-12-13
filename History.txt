@@ -1,3 +1,8 @@
+=== 0.6 / 2008-12-13
+
+  * Removed managed client and all related libs.
+  * Switched to Shoulda for tests in an effort to clean them up a bit.
+
 === 0.5 / 2008-12-01
 
   * Moved sphinx extended query string generator into a class of its own.

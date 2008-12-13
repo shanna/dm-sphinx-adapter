@@ -1,5 +1,3 @@
-require 'benchmark'
-
 module DataMapper
   module Adapters
     module Sphinx
