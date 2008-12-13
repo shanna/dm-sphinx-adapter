@@ -42,28 +42,17 @@ module DataMapper
         # uri_or_options<URI, DataObject::URI, Addressable::URI, String, Hash, Pathname>::
         #   DataMapper uri or options hash.
         def initialize(name, uri_or_options)
-          super
-
-          managed = !!(uri_or_options.kind_of?(Hash) && uri_or_options[:managed])
-          @client  = managed ? ManagedClient.new(uri_or_options) : Client.new(uri_or_options)
+          options = normalize_options(uri_or_options)
+          @client = Riddle::Client.new(options.delete(:host), options.delete(:port))
+          options.each{|k, v| @client.method("#{k}=".to_sym).call(v) if @client.respond_to?("#{k}=".to_sym)}
         end
 
-        # Interaction with searchd and indexer.
-        #
-        # ==== See
-        # * DataMapper::Adapters::Sphinx::Client
-        # * DataMapper::Adapters::Sphinx::ManagedClient
-        #
-        # ==== Returns
-        # DataMapper::Adapters::Sphinx::Client:: The client.
-        attr_reader :client
-
         def create(resources) #:nodoc:
-          true
+          0
         end
 
         def delete(query) #:nodoc:
-          true
+          0
         end
 
         # Query your Sphinx repository and return all matching documents.
@@ -122,20 +111,6 @@ module DataMapper
             indexes
           end
 
-          # List sphinx delta indexes to search.
-          #
-          # ==== See
-          # * DataMapper::Adapters::Sphinx::Resource::ClassMethods#sphinx_indexes
-          #
-          # ==== Parameters
-          # model<DataMapper::Model>:: The DataMapper::Model.
-          #
-          # ==== Returns
-          # Array<DataMapper::Adapters::Sphinx::Index>:: Index objects from the model.
-          def delta_indexes(model)
-            indexes(model).find_all{|i| i.delta?}
-          end
-
           # Query sphinx for a list of document IDs.
           #
           # ==== Parameters
@@ -147,31 +122,25 @@ module DataMapper
           def read(query)
             from    = indexes(query.model).map{|index| index.name}.join(', ')
             search  = Sphinx::Query.new(query).to_s
-            options = {
-              :match_mode => :extended,
-              :filters    => search_filters(query) # By attribute.
-            }
-            options[:limit]  = query.limit.to_i  if query.limit
-            options[:offset] = query.offset.to_i if query.offset
+
+            client            = @client.dup
+            client.match_mode = :extended
+            client.filters    = search_filters(query) # By attribute.
+            client.limit      = query.limit.to_i  if query.limit
+            client.offset     = query.offset.to_i if query.offset
 
             if order = search_order(query)
-              options.update(
-                :sort_mode => :extended,
-                :sort_by   => order
-              )
+              client.sort_mode = :extended
+              client.sort_by   = order
             end
 
-            indexes = indexes.join(' ') if indexes.kind_of?(Array)
-
-            client = Riddle::Client.new(@uri.host, @uri.port)
-            options.each{|k, v| client.method("#{k}=".to_sym).call(v) if client.respond_to?("#{k}=".to_sym)}
-            res = client.query(query, indexes.to_s)
-            raise res[:error] unless res[:error].nil?
+            result = client.query(search, from)
+            raise result[:error] unless result[:error].nil?
 
             DataMapper.logger.info(
-              %q{Sphinx (%.3f): search '%s' in '%s' found %d documents} % [res[:time], search, from, res[:total]]
+              %q{Sphinx (%.3f): search '%s' in '%s' found %d documents} % [result[:time], search, from, result[:total]]
             )
-            res[:matches].map{|doc| {:id => doc[:doc]}}
+            result[:matches].map{|doc| {:id => doc[:doc]}}
           end
 
 
@@ -199,6 +168,26 @@ module DataMapper
             end
             by.empty? ? nil : by.join(', ')
           end
+
+          # Coerce +uri_or_options+ into a +Hash+ of options.
+          #
+          # ==== Parameters
+          # uri_or_options<URI, DataObject::URI, Addressable::URI, String, Hash, Pathname>::
+          #   DataMapper uri or options hash.
+          #
+          # ==== Returns
+          # Hash
+          def normalize_options(uri_or_options)
+            case uri_or_options
+              when String, Addressable::URI then DataObjects::URI.parse(uri_or_options).attributes
+              when DataObjects::URI         then uri_or_options.attributes
+              when Pathname                 then {:path => uri_or_options}
+              else
+                uri_or_options[:path] ||= uri_or_options.delete(:config) || uri_or_options.delete(:database)
+                uri_or_options
+            end
+          end
+
       end # Adapter
     end # Sphinx
 

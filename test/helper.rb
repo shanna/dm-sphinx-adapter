@@ -25,13 +25,13 @@ require 'dm-sphinx-adapter'
 
 # Sphinx runner.
 Dir.chdir(base)
-config = base + 'files' + 'mysql5.sphinx.conf'
+config = base + 'test' + 'files' + 'mysql5.sphinx.conf'
 begin
-  TCPSocket.new('localhost', '3312') rescue
-  `searchd --config #{config}` || exit
-end
-at_exit do
-  `searchd --config #{config} --stop`
+  TCPSocket.new('localhost', '3312')
+rescue
+  puts 'Starting Sphinx...'
+  system("searchd --config #{config}") || exit
+  system('ps aux | grep searchd')
 end
 
 class Test::Unit::TestCase
@@ -46,6 +46,7 @@ class Test::Unit::TestCase
     indexer = `indexer --config #{files + 'mysql5.sphinx.conf'} --all --rotate`
     raise %{Re-create index failed:\n #{indexer}} if indexer =~ /error|fatal/i
 
+    DataMapper.setup(:default, :adapter => 'mysql', :database => 'dm_sphinx_adapter_test')
     sleep 1; # Give sphinx a chance to catch up before test runs.
   end
 
