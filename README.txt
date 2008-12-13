@@ -11,8 +11,6 @@ A DataMapper Sphinx adapter.
 == Dependencies
 
 * dm-core           ~> 0.9.7
-* riddle            ~> 0.9
-* daemon_controller ~> 0.2   (optional)
 * dm-is-searchable  ~> 0.9.7 (optional)
 
 I'd recommend using the dm-more plugin dm-is-searchable instead of fetching the document id's yourself.
@@ -42,7 +40,6 @@ The breakdown is:
   - adapter Must be :sphinx
   - host    Hostname (default: localhost)
   - port    Optional port number (default: 3312)
-  - config  Optional but strongly recommended path to sphinx config file.
 
 Alternatively supply a Hash:
   DataMapper.setup(:search, {
@@ -50,7 +47,6 @@ Alternatively supply a Hash:
     :config   => './sphinx.conf' # optional. Recommended though.
     :host     => 'localhost',    # optional. Default: localhost
     :port     => 3312            # optional. Default: 3312
-    :managed  => true            # optional. Self managed searchd server using daemon_controller.
   }
 
 === DataMapper
@@ -143,7 +139,6 @@ For finer grained control you can include DataMapper::SphinxResource. For instan
 and sort, include or exclude by attributes defined in your sphinx configuration:
 
   class Item
-    include DataMapper::Resource # Optional, included by SphinxResource if you leave it out yourself.
     include DataMapper::SphinxResource
     property :id, Serial
     property :name, String
@@ -164,28 +159,16 @@ and sort, include or exclude by attributes defined in your sphinx configuration:
 
 == Sphinx Configuration
 
-Though you don't have to supply the sphinx configuration file to dm-sphinx-adapter I'd recommend doing it anyway.
-It's more DRY since all searchd/indexer options can be read straight from the configuration.
-
-  DataMapper.setup(:search, :adapter => 'sphinx', :config => '/path/to/sphinx.conf')
-  DataMapper.setup(:search, 'sphinx://localhost/path/to/sphinx.conf')
-
-If your sphinx.conf lives in either of the default locations /usr/local/etc/sphinx.conf or ./sphinx.conf then you
-only need to supply:
-
-  DataMapper.setup(:search, :adapter => 'sphinx')
+No limitations, restrictions or requirement are imposed on your sphinx configuration. The adapter will not generate nor
+overwrite your finely crafted config file.
 
 == Searchd
 
-As of 0.2 I've added a managed searchd option using daemon_controller. It may come in handy if you only use God, Monit
-or whatever in production. Use the Hash form of DataMapper#setup and supply the option :managed with a true value and
-daemon_controller will start searchd on demand.
+To keep things simple, this adapter does not manage your sphinx server. Try one of these fine offerings:
 
-It is already strongly encouraged but you will need to specify the path to your sphinx configuration file in order for
-searchd to run. See Sphinx Configuration, DataMapper::Adapters::Sphinx::ManagedClient.
-
-The daemon_controller library can be found only on github, not rubyforge.
-See http://github.com/FooBarWidget/daemon_controller/tree/master
+* god[http://god.rubyforge.org]
+* daemon_controller[http://github.com/FooBarWidget/daemon_controller/tree/master]
+* monit[http://www.tildeslash.com/monit]
 
 == Indexer and Live(ish) updates.
 
@@ -197,12 +180,6 @@ unreliable at best I've chosen to remove it.
 For reliable live(ish) updates in a main + delta scheme it's probably best you schedule them outside of your ORM.
 Andrew (Shodan) Aksyonoff of Sphinx suggests a cronjob or alternatively if you need even less lag to "run indexer in
 an endless loop, with a few seconds of sleep in between to allow searchd some headroom to pick up the changes".
-
-== Todo
-
-* Add DataMapper::Adapters::Sphinx::Client#attribute_set to allow attribute modification on one or more indexes. It's
-  the only thing missing if you understand the pitfalls and still want to add thinking-sphinx like delta indexing to
-  your resource.
 
 == Contributing
 

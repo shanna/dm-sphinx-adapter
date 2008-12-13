@@ -1,9 +1,10 @@
 require 'rubygems'
 
 # TODO: Hide the shitload of dm-core warnings or at least try to?
-$VERBOSE = nil
-gem 'dm-core', '~> 0.9.7'
-require 'dm-core'
+old_verbose, $VERBOSE = $VERBOSE, nil
+  gem 'dm-core', '~> 0.9.7'
+  require 'dm-core'
+$VERBOSE = old_verbose
 
 require 'pathname'
 lib = Pathname(__FILE__).dirname.expand_path

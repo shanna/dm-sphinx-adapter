@@ -1,22 +1,10 @@
-class Object
-  unless Object.respond_to?(:silence_warnings)
-    def silence_warnings
-      old_verbose, $VERBOSE = $VERBOSE, nil
-      yield
-    ensure
-      $VERBOSE = old_verbose
-    end
-  end
-end
-
-silence_warnings do
-  require 'rubygems'
-  require 'extlib'
-  require 'extlib/hook'
-  require 'pathname'
-  require 'shoulda'
-  require 'test/unit'
-end
+$VERBOSE = false # Shitloads of warnings in dm :(
+require 'rubygems'
+require 'extlib'
+require 'extlib/hook'
+require 'pathname'
+require 'shoulda'
+require 'test/unit'
 
 base = Pathname.new(__FILE__).dirname + '..'
 %w{lib test}.each{|p| $:.unshift base + p}
@@ -61,5 +49,3 @@ class Test::Unit::TestCase
   end
 end
 
-# Force warnings for everything to come? I wish. DM barfs all over the joint.
-# $VERBOSE = true

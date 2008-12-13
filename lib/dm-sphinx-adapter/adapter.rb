@@ -22,21 +22,17 @@ module DataMapper
       #   - adapter Must be :sphinx
       #   - host    Hostname (default: localhost)
       #   - port    Optional port number (default: 3312)
-      #   - config  Optional but recommended path to sphinx config file.
       #
       # Alternatively supply a Hash:
       #   DataMapper.setup(:search, {
       #     :adapter  => 'sphinx',       # required
-      #     :config   => './sphinx.conf' # optional. Recommended though.
       #     :host     => 'localhost',    # optional. Default: localhost
       #     :port     => 3312            # optional. Default: 3312
-      #     :managed  => true            # optional. Self managed searchd server using daemon_controller.
       #   })
       class Adapter < AbstractAdapter
 
         # ==== See
-        # * DataMapper::Adapters::Sphinx::Config
-        # * DataMapper::Adapters::Sphinx::Client
+        # * DataMapper::Adapters::AbstractAdapter
         #
         # ==== Parameters
         # uri_or_options<URI, DataObject::URI, Addressable::URI, String, Hash, Pathname>::
