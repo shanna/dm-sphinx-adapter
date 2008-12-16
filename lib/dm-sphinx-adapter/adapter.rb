@@ -36,6 +36,8 @@ module DataMapper
         # uri_or_options<URI, DataObject::URI, Addressable::URI, String, Hash, Pathname>::
         #   DataMapper uri or options hash.
         def initialize(name, uri_or_options)
+          super # Set up defaults.
+
           options = normalize_options(uri_or_options)
           @client = Riddle::Client.new(options.delete(:host), options.delete(:port))
           options.each{|k, v| @client.method("#{k}=".to_sym).call(v) if @client.respond_to?("#{k}=".to_sym)}

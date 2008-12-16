@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'helper')
 
 class TestAdapter < Test::Unit::TestCase
-  context 'DM::A::Sphinx::Adapter class' do
+  context 'DM::A::Sphinx::Adapter' do
     setup do
       DataMapper.setup(:adapter, :adapter => 'sphinx')
       load File.join(File.dirname(__FILE__), 'files', 'model.rb')
@@ -9,14 +9,30 @@ class TestAdapter < Test::Unit::TestCase
       @resource = Item
     end
 
+    context 'class' do
+      should 'use default field naming convention' do
+        assert_equal(
+          DataMapper::NamingConventions::Field::Underscored,
+          @it.adapter.field_naming_convention
+        )
+      end
+
+      should 'use default resource naming convention' do
+        assert_equal(
+          DataMapper::NamingConventions::Resource::UnderscoredAndPluralized,
+          @it.adapter.resource_naming_convention
+        )
+      end
+    end
+
     context '#create' do
-      should 'should return zero records created' do
+      should 'return zero records created' do
         assert_equal 0, @it.create(create_resource)
       end
     end
 
     context '#delete' do
-      should 'should return zero records deleted' do
+      should 'return zero records deleted' do
         assert_equal 0, @it.delete(create_resource)
       end
     end
