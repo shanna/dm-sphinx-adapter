@@ -1,3 +1,8 @@
+=== 0.6.1 / 2008-12-16
+
+  * The adapter returns the entire Riddle::Client#query response so document :weight and :attributes are usable.
+  * Fixed broken naming convention bug. The AbstractAdapter constructor was not being called.
+
 === 0.6 / 2008-12-13
 
   * Removed managed client and all related libs.
