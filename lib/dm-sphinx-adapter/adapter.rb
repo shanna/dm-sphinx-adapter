@@ -37,10 +37,7 @@ module DataMapper
         #   DataMapper uri or options hash.
         def initialize(name, uri_or_options)
           super # Set up defaults.
-
-          options = normalize_options(uri_or_options)
-          @client = Riddle::Client.new(options.delete(:host), options.delete(:port))
-          options.each{|k, v| @client.method("#{k}=".to_sym).call(v) if @client.respond_to?("#{k}=".to_sym)}
+          @options = normalize_options(uri_or_options)
         end
 
         def create(resources) #:nodoc:
@@ -118,10 +115,15 @@ module DataMapper
           # Array<Hash>:: An array of document hashes. <tt>[{:id => 1, ...}, {:id => 2, ...}]</tt>
           # Array<>::     An empty array if no documents match.
           def read(query)
-            from    = indexes(query.model).map{|index| index.name}.join(', ')
-            search  = Sphinx::Query.new(query).to_s
+            from   = indexes(query.model).map{|index| index.name}.join(', ')
+            search = Sphinx::Query.new(query).to_s
+            client = Riddle::Client.new(@options[:host], @options[:port])
 
-            client            = @client.dup
+            # You can set some options that aren't set by the adapter.
+            @options.except(:host, :port, :match_mode, :limit, :offset, :sort_mode, :sort_by).each do |k, v|
+              client.method("#{k}=".to_sym).call(v) if client.respond_to?("#{k}=".to_sym)
+            end
+
             client.match_mode = :extended
             client.filters    = search_filters(query) # By attribute.
             client.limit      = query.limit.to_i  if query.limit
