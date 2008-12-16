@@ -1,3 +1,7 @@
+=== 0.6.2 / 2008-12-16
+
+  * Fixed shallow .dup of riddle client errors. You need to upgrade if you are running 0.6.1.
+
 === 0.6.1 / 2008-12-16
 
   * The adapter returns the entire Riddle::Client#query response so document :weight and :attributes are usable.
