@@ -56,11 +56,13 @@ module DataMapper
         # These methods are public but normally called indirectly through DataMapper::Resource#get,
         # DataMapper::Resource#first or DataMapper::Resource#all.
         #
+        # The document hashes returned are those from Riddle::Client.
+        #
         # ==== Parameters
         # query<DataMapper::Query>:: The query object.
         #
         # ==== Returns
-        # Array<Hash>:: An array of document hashes. <tt>[{:id => 1}, {:id => 2}]</tt>
+        # Array<Hash>:: An array of document hashes. <tt>[{:id => 1, ...}, {:id => 2, ...}]</tt>
         # Array<>::     An empty array if no documents match.
         def read_many(query)
           read(query)
@@ -77,7 +79,7 @@ module DataMapper
         # query<DataMapper::Query>:: The query object.
         #
         # ==== Returns
-        # Hash:: An document hash of the first document matched. <tt>{:id => 1}</tt>
+        # Hash:: An document hash of the first document matched. <tt>{:id => 1, ...}</tt>
         # Nil::  If no documents match.
         def read_one(query)
           read(query).first
@@ -111,7 +113,7 @@ module DataMapper
           # query<DataMapper::Query>:: The query object.
           #
           # ==== Returns
-          # Array<Hash>:: An array of document hashes. <tt>[{:id => 1}, {:id => 2}]</tt>
+          # Array<Hash>:: An array of document hashes. <tt>[{:id => 1, ...}, {:id => 2, ...}]</tt>
           # Array<>::     An empty array if no documents match.
           def read(query)
             from    = indexes(query.model).map{|index| index.name}.join(', ')
@@ -134,7 +136,7 @@ module DataMapper
             DataMapper.logger.info(
               %q{Sphinx (%.3f): search '%s' in '%s' found %d documents} % [result[:time], search, from, result[:total]]
             )
-            result[:matches].map{|doc| {:id => doc[:doc]}}
+            result[:matches].map{|doc| doc[:id] = doc[:doc]; doc}
           end
 
 
