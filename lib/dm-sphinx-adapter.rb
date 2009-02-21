@@ -2,7 +2,7 @@ require 'rubygems'
 
 # TODO: Hide the shitload of dm-core warnings or at least try to?
 old_verbose, $VERBOSE = $VERBOSE, nil
-  gem 'dm-core', '~> 0.9.7'
+  gem 'dm-core', '~> 0.9.8'
   require 'dm-core'
 $VERBOSE = old_verbose
 

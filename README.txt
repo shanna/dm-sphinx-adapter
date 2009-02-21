@@ -11,8 +11,8 @@ A DataMapper Sphinx adapter.
 == Dependencies
 
 Ruby::
-* dm-core           ~> 0.9.10
-* dm-is-searchable  ~> 0.9.10 (optional)
+* dm-core           ~> 0.9.7
+* dm-is-searchable  ~> 0.9.7 (optional)
 
 I'd recommend using the dm-more plugin dm-is-searchable instead of fetching the document id's yourself.
 
