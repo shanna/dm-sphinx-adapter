@@ -10,10 +10,23 @@ A DataMapper Sphinx adapter.
 
 == Dependencies
 
-* dm-core           ~> 0.9.7
-* dm-is-searchable  ~> 0.9.7 (optional)
+Ruby::
+* dm-core           ~> 0.9.10
+* dm-is-searchable  ~> 0.9.10 (optional)
 
 I'd recommend using the dm-more plugin dm-is-searchable instead of fetching the document id's yourself.
+
+Sphinx::
+* 0.9.8-r871
+* 0.9.8-r909
+* 0.9.8-r985
+* 0.9.8-r1065
+* 0.9.8-r1112
+* 0.9.8-rc1 (gem version: 0.9.8.1198)
+* 0.9.8-rc2 (gem version: 0.9.8.1231)
+* 0.9.8 (gem version: 0.9.8.1371)
+
+Internally the Riddle client library is used.
 
 == Install
 
