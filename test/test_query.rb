@@ -3,9 +3,8 @@ require File.join(File.dirname(__FILE__), 'helper')
 class TestQuery < Test::Unit::TestCase
   context 'DM::A::Sphinx::Query conditions' do
     setup do
-      DataMapper.setup(:adapter, :adapter => 'sphinx')
       load File.join(File.dirname(__FILE__), 'files', 'model.rb')
-      @adapter  = repository(:adapter)
+      @adapter  = repository(:search)
       @resource = Item
     end
 

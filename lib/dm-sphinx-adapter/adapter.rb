@@ -98,10 +98,10 @@ module DataMapper
           #
           # ==== Returns
           # Array<DataMapper::Adapters::Sphinx::Index>:: Index objects from the model.
-          def indexes(model)
-            indexes = model.sphinx_indexes(repository(self.name).name) if model.respond_to?(:sphinx_indexes)
+          def indexes(query)
+            indexes = query.model.sphinx_indexes(query.repository.name) if query.model.respond_to?(:sphinx_indexes)
             if indexes.nil? or indexes.empty?
-              indexes = [Index.new(model, model.storage_name)]
+              indexes = [Index.new(query.model, query.model.storage_name(query.repository.name))]
             end
             indexes
           end
@@ -115,7 +115,7 @@ module DataMapper
           # Array<Hash>:: An array of document hashes. <tt>[{:id => 1, ...}, {:id => 2, ...}]</tt>
           # Array<>::     An empty array if no documents match.
           def read(query)
-            from   = indexes(query.model).map{|index| index.name}.join(', ')
+            from   = indexes(query).map{|index| index.name}.join(', ')
             search = Sphinx::Query.new(query).to_s
             client = Riddle::Client.new(@options[:host], @options[:port])
 

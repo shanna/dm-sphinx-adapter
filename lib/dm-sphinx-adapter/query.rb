@@ -31,10 +31,11 @@ module DataMapper
             query.conditions.each do |operator, property, value|
               next if property.kind_of? Sphinx::Attribute # Filters are added elsewhere.
               normalized = normalize_value(value)
+              field      = property.field(query.repository.name) unless operator == :raw
               @query << case operator
-                when :eql, :like then '@%s "%s"'  % [property.field.to_s, normalized.join(' ')]
-                when :not        then '@%s -"%s"' % [property.field.to_s, normalized.join(' ')]
-                when :in         then '@%s (%s)'  % [property.field.to_s, normalized.map{|v| %{"#{v}"}}.join(' | ')]
+                when :eql, :like then '@%s "%s"'  % [field.to_s, normalized.join(' ')]
+                when :not        then '@%s -"%s"' % [field.to_s, normalized.join(' ')]
+                when :in         then '@%s (%s)'  % [field.to_s, normalized.map{|v| %{"#{v}"}}.join(' | ')]
                 when :raw        then "#{property}"
                 else raise NotImplementedError.new("Sphinx: Query fields do not support the #{operator} operator")
               end

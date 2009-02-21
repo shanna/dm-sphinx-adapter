@@ -16,8 +16,8 @@ lib/riddle/client/filter.rb
 lib/riddle/client/message.rb
 lib/riddle/client/response.rb
 test/files/model.rb
-test/files/mysql5.sphinx.conf
-test/files/mysql5.sql
+test/files/source.xml
+test/files/sphinx.conf
 test/helper.rb
 test/test_adapter.rb
 test/test_attribute.rb

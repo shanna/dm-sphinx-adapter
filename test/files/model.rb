@@ -1,4 +1,5 @@
 class Item
+  include DataMapper::Resource
   include DataMapper::SphinxResource
   property :id,         Serial
   property :t_string,   String

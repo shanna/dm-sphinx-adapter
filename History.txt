@@ -1,3 +1,7 @@
+=== 0.7 / 2009-02-21
+
+  * Explicit repository names everywhere I can. DM ~> 0.9.10 and dm-sphinx-adapter 0.6.2 couldn't guess the default repository name.
+
 === 0.6.2 / 2008-12-16
 
   * Fixed shallow .dup of riddle client errors. You need to upgrade if you are running 0.6.1.

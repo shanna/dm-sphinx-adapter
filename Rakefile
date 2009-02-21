@@ -3,10 +3,10 @@
 require 'rubygems'
 require 'hoe'
 
-Hoe.new('dm-sphinx-adapter', '0.6.2') do |p|
+Hoe.new('dm-sphinx-adapter', '0.7') do |p|
   p.developer('Shane Hanna', 'shane.hanna@gmail.com')
   p.extra_deps = [
-    ['dm-core', '~> 0.9.7']
+    ['dm-core', '~> 0.9.10']
   ]
 end
 
