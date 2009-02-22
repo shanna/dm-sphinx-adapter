@@ -99,9 +99,9 @@ module DataMapper
           # ==== Returns
           # Array<DataMapper::Adapters::Sphinx::Index>:: Index objects from the model.
           def indexes(query)
-            indexes = query.model.sphinx_indexes(query.repository.name) if query.model.respond_to?(:sphinx_indexes)
+            indexes = query.model.sphinx_indexes(name) if query.model.respond_to?(:sphinx_indexes)
             if indexes.nil? or indexes.empty?
-              indexes = [Index.new(query.model, query.model.storage_name(query.repository.name))]
+              indexes = [Index.new(query.model, query.model.storage_name(name))]
             end
             indexes
           end
