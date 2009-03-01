@@ -10,6 +10,7 @@ lib/dm-sphinx-adapter/attribute.rb
 lib/dm-sphinx-adapter/index.rb
 lib/dm-sphinx-adapter/query.rb
 lib/dm-sphinx-adapter/resource.rb
+lib/dm-sphinx-adapter/xmlpipe2.rb
 lib/riddle.rb
 lib/riddle/client.rb
 lib/riddle/client/filter.rb
@@ -18,9 +19,11 @@ lib/riddle/client/response.rb
 test/files/model.rb
 test/files/source.xml
 test/files/sphinx.conf
+test/files/test_xmlpipe2.xml
 test/helper.rb
 test/test_adapter.rb
 test/test_attribute.rb
 test/test_index.rb
 test/test_query.rb
 test/test_resource.rb
+test/test_xmlpipe2.rb
