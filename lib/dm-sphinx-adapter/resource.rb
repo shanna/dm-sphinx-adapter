@@ -21,11 +21,20 @@ module DataMapper
       #     end
       #   end
       module Resource
+
+        def self.append_inclusions(*inclusions)
+          extra_inclusions.concat inclusions
+          true
+        end
+
+        def self.extra_inclusions
+          @extra_inclusions ||= []
+        end
+
         def self.included(model) #:nodoc:
-          model.class_eval do
-            include DataMapper::Resource
-            extend ClassMethods
-          end
+          model.send(:include, DataMapper::Resource)
+          model.extend ClassMethods if defined?(ClassMethods)
+          extra_inclusions.each{|inclusion| model.send(:include, inclusion)}
         end
 
         module ClassMethods
@@ -89,7 +98,15 @@ module DataMapper
           # ==== Returns
           # Array<DataMapper::Adapters::Sphinx::Attribute>
           def sphinx_attributes(repository_name = default_repository_name)
-            properties(repository_name).grep{|p| p.kind_of? Sphinx::Attribute}
+            properties(repository_name).find_all{|p| p.kind_of? Sphinx::Attribute}
+          end
+
+          # List of properties (aka sphinx fields).
+          #
+          # This list will be the inverse of properties not declared as attributes.
+          # ==== Returns
+          def sphinx_fields(repository_name = default_repository_name)
+            properties(repository_name).reject{|p| p.kind_of? Sphinx::Attribute}
           end
 
         end # ClassMethods

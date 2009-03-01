@@ -10,30 +10,30 @@
   </sphinx:schema>
 
   <sphinx:document id="1">
-    <t_string>one</t_string>
-    <t_text>text one!</t_text>
-    <t_decimal>10.5</t_decimal>
-    <t_float>100.5</t_float>
-    <t_integer>1000</t_integer>
-    <t_datetime>1235183682</t_datetime>
+    <t_string><![CDATA[one]]></t_string>
+    <t_text><![CDATA[text one!]]></t_text>
+    <t_decimal><![CDATA[10.5]]></t_decimal>
+    <t_float><![CDATA[100.5]]></t_float>
+    <t_integer><![CDATA[1000]]></t_integer>
+    <t_datetime><![CDATA[1235183682]]></t_datetime>
   </sphinx:document>
 
   <sphinx:document id="2">
-    <t_string>two</t_string>
-    <t_text>text two!</t_text>
-    <t_decimal>20.5</t_decimal>
-    <t_float>200.5</t_float>
-    <t_integer>2000</t_integer>
-    <t_datetime>1235183682</t_datetime>
+    <t_string><![CDATA[two]]></t_string>
+    <t_text><![CDATA[text two!]]></t_text>
+    <t_decimal><![CDATA[20.5]]></t_decimal>
+    <t_float><![CDATA[200.5]]></t_float>
+    <t_integer><![CDATA[2000]]></t_integer>
+    <t_datetime><![CDATA[1235183682]]></t_datetime>
   </sphinx:document>
 
   <sphinx:document id="3">
-    <t_string>three</t_string>
-    <t_text>text three!</t_text>
-    <t_decimal>30.5</t_decimal>
-    <t_float>300.5</t_float>
-    <t_integer>3000</t_integer>
-    <t_datetime>1235183682</t_datetime>
+    <t_string><![CDATA[three]]></t_string>
+    <t_text><![CDATA[text three!]]></t_text>
+    <t_decimal><![CDATA[30.5]]></t_decimal>
+    <t_float><![CDATA[300.5]]></t_float>
+    <t_integer><![CDATA[3000]]></t_integer>
+    <t_datetime><![CDATA[1235183682]]></t_datetime>
   </sphinx:document>
 </sphinx:docset>
 

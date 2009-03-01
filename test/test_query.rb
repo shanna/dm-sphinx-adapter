@@ -38,9 +38,9 @@ class TestQuery < Test::Unit::TestCase
 
     should 'treat multiple .eql operators as AND search' do
       # When is DM going to switch conditions to an array? :(
-      assert /(?:@t_string "b" )?@t_string "a"(?: @t_string "b")?/.match(
+      assert(/(?:@t_string "b" )?@t_string "a"(?: @t_string "b")?/.match(
         query_string(:t_string.eql => 'a', :t_string.eql => 'b')
-      )
+      ))
     end
 
     should 'leave raw conditions as they are' do
