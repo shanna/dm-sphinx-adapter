@@ -1,8 +1,8 @@
-require 'builder'
-
 module DataMapper
   module Adapters
     module Sphinx
+      require 'builder'
+
 
       # Sphinx xmlpipe2.
       #

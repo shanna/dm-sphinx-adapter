@@ -3,6 +3,13 @@ require 'dm-sphinx-adapter/xmlpipe2'
 
 class TestResource < Test::Unit::TestCase
   context 'DM::A::Sphinx::Resource module' do
+    begin
+      require 'nokogiri'
+    rescue LoadError
+      warn '  * WARNING: Nokogiri not found, skipping xmlpipe2 tests.'
+      return nil
+    end
+
     setup do
       load File.join(File.dirname(__FILE__), 'files', 'model.rb')
     end
@@ -12,7 +19,7 @@ class TestResource < Test::Unit::TestCase
     end
 
     context '#xmlpipe2' do
-      should 'stream to stdout' do
+      setup do
         $stdout = StringIO.new
         Item.create(
           :id         => 1,
@@ -24,14 +31,45 @@ class TestResource < Test::Unit::TestCase
           :t_datetime => Time.at(1235914716)
         )
         Item.xmlpipe2(:default, :search)
-        xml = $stdout.rewind && $stdout.read
+        @xml = $stdout.rewind && $stdout.read
+        @doc = Nokogiri::XML.parse(@xml) rescue nil
+        @ns  = {'s' => 'sphinx'}
         $stdout = STDOUT
+      end
 
-        # TODO: Nokogiri or something and test some xpaths instead of a big eq match.
-        assert_equal(
-          File.open(File.join(File.dirname(__FILE__), 'files', 'test_xmlpipe2.xml')).read.chomp,
-          xml
-        )
+      should 'stream xml to stdout' do
+        assert_not_nil @xml
+        assert_not_nil @doc
+      end
+
+      context 'schema' do
+        should 'have id field' do
+          assert_not_nil @doc.xpath(%q{//s:field[@name='id']}, @ns).first
+        end
+
+        should 'have t_string field' do
+          assert_not_nil @doc.xpath(%q{//s:field[@name='t_string']}, @ns).first
+        end
+
+        should 'have text attribute' do
+          assert_not_nil @doc.xpath(%q{//s:attr[@name='t_text' and @type='str2ordinal']}, @ns).first
+        end
+
+        should 'have decimal attribute' do
+          assert_not_nil @doc.xpath(%q{//s:attr[@name='t_decimal' and @type='float']}, @ns).first
+        end
+
+        should 'have float attribute' do
+          assert_not_nil @doc.xpath(%q{//s:attr[@name='t_float' and @type='float']}, @ns).first
+        end
+
+        should 'have int attribute' do
+          assert_not_nil @doc.xpath(%q{//s:attr[@name='t_integer' and @type='int']}, @ns).first
+        end
+
+        should 'have timestamp attribute' do
+          assert_not_nil @doc.xpath(%q{//s:attr[@name='t_datetime' and @type='timestamp']}, @ns).first
+        end
       end
     end
   end
