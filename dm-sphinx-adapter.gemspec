@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dm-sphinx-adapter}
-  s.version = "0.7.1"
+  s.version = "0.8.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Shane Hanna"]
-  s.date = %q{2009-04-12}
+  s.date = %q{2009-05-10}
   s.email = %q{shane.hanna@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
     "lib/dm-sphinx-adapter.rb",
     "lib/dm-sphinx-adapter/adapter.rb",
     "lib/dm-sphinx-adapter/attribute.rb",
+    "lib/dm-sphinx-adapter/collection.rb",
     "lib/dm-sphinx-adapter/index.rb",
     "lib/dm-sphinx-adapter/query.rb",
     "lib/dm-sphinx-adapter/resource.rb",
@@ -34,6 +35,7 @@ Gem::Specification.new do |s|
     "test/helper.rb",
     "test/test_adapter.rb",
     "test/test_attribute.rb",
+    "test/test_collection.rb",
     "test/test_index.rb",
     "test/test_query.rb",
     "test/test_resource.rb",
@@ -50,6 +52,7 @@ Gem::Specification.new do |s|
     "test/helper.rb",
     "test/test_adapter.rb",
     "test/test_attribute.rb",
+    "test/test_collection.rb",
     "test/test_index.rb",
     "test/test_query.rb",
     "test/test_resource.rb",
