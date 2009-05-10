@@ -17,6 +17,7 @@ require 'riddle'
 # TODO: Require farms suck. Do something about it.
 require dir / 'adapter'
 require dir / 'attribute'
+require dir / 'collection'
 require dir / 'index'
 require dir / 'query'
 require dir / 'resource'

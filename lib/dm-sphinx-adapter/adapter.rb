@@ -140,7 +140,9 @@ module DataMapper
             DataMapper.logger.info(
               %q{Sphinx (%.3f): search '%s' in '%s' found %d documents} % [result[:time], search, from, result[:total]]
             )
-            result[:matches].map{|doc| doc[:id] = doc[:doc]; doc}
+            # TODO: Confusing, call it something other than collection?
+            Collection.new(result)
+            # result[:matches].map{|doc| doc[:id] = doc[:doc]; doc}
           end
 
 
