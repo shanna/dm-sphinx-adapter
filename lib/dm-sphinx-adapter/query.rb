@@ -1,68 +1,33 @@
 module DataMapper
-  module Adapters
-    module Sphinx
+  module Sphinx
+    # Extends DM::Query with the ability to cast itself as a DM::Sphinx::Search object.
+    class Query < DataMapper::Query
+      # The cast Search object.
+      attr_reader :search
 
-      # Sphinx extended search query string from DataMapper query.
-      class Query
-        include Extlib::Assertions
+      #--
+      # TODO: Document extra :mode and :filters options.
+      # TODO: This still smells 'iffy.
+      def initialize(repository, model, options = {})
+        # The Query wouldn't pass validation if I didn't remove the extra arguments.
+        mode    = options.delete(:mode)
+        filters = options.delete(:filters)
+        super
 
-        # Initialize a new extended Sphinx query from a DataMapper::Query object.
-        #
-        # If the query has no conditions an '' empty string will be generated possibly triggering Sphinx's full scan
-        # mode.
-        #
-        # ==== See
-        # * http://www.sphinxsearch.com/doc.html#searching
-        # * http://www.sphinxsearch.com/doc.html#conf-docinfo
-        # * http://www.sphinxsearch.com/doc.html#extended-syntax
-        #
-        # ==== Raises
-        # NotImplementedError:: DataMapper operators that can't be expressed in the extended sphinx query syntax.
-        #
-        # ==== Parameters
-        # query<DataMapper::Query>:: DataMapper query object.
-        def initialize(query)
-          assert_kind_of 'query', query, DataMapper::Query
-          @query  = []
-
-          if query.conditions.empty?
-            @query << ''
-          else
-            query.conditions.each do |operator, property, value|
-              next if property.kind_of? Sphinx::Attribute # Filters are added elsewhere.
-              normalized = normalize_value(value)
-              field      = property.field(query.repository.name) unless operator == :raw
-              @query << case operator
-                when :eql, :like then '@%s "%s"'  % [field.to_s, normalized.join(' ')]
-                when :not        then '@%s -"%s"' % [field.to_s, normalized.join(' ')]
-                when :in         then '@%s (%s)'  % [field.to_s, normalized.map{|v| %{"#{v}"}}.join(' | ')]
-                when :raw        then "#{property}"
-                else raise NotImplementedError.new("Sphinx: Query fields do not support the #{operator} operator")
-              end
-            end
-          end
+        filters = Search::Filters.new(self.dup.clear.update(filters || {}))
+        search  = case mode
+          when :extended2, nil then Search::Extended2.new(self)
+          # TODO: Modes.
+          # when :extended
+          # when :all
+          # when :any
+          # when :phrase
+          # when :boolean
+          else raise ArgumentError, "+options[:mode]+ used an unknown mode #{mode.inspect}."
         end
-
-        # ==== Returns
-        # String:: The extended sphinx query string.
-        def to_s
-          @query.join(' ')
-        end
-
-        protected
-          # Normalize and escape DataMapper query value(s) to escaped sphinx query values.
-          #
-          # ==== Parameters
-          # value<String, Array>:: The query value.
-          #
-          # ==== Returns
-          # Array:: An array of one or more query values.
-          def normalize_value(value)
-            [value].flatten.map do |v|
-              v.to_s.gsub(/[\(\)\|\-!@~"&\/]/){|char| "\\#{char}"}
-            end
-          end
-      end # Query
-    end # Sphinx
-  end # Adapters
+        @search = Search.new(search, filters)
+      end
+    end # Query
+  end # Sphinx
 end # DataMapper
+
