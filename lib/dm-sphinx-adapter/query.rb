@@ -10,12 +10,12 @@ module DataMapper
       # TODO: This still smells 'iffy.
       def initialize(repository, model, options = {})
         # The Query wouldn't pass validation if I didn't remove the extra arguments.
-        mode    = options.delete(:mode)
-        filters = options.delete(:filters)
+        mode   = options.delete(:mode)
+        filter = options.delete(:filter)
         super
 
-        filters = Search::Filters.new(self.dup.clear.update(filters || {}))
-        search  = case mode
+        filter = Search::Filter.new(self.dup.clear.update(filter || {}))
+        match  = case mode
           when :extended2, nil then Search::Extended2.new(self)
           # TODO: Modes.
           # when :extended
@@ -25,7 +25,7 @@ module DataMapper
           # when :boolean
           else raise ArgumentError, "+options[:mode]+ used an unknown mode #{mode.inspect}."
         end
-        @search = Search.new(search, filters)
+        @search = Search.new(match, filter)
       end
     end # Query
   end # Sphinx

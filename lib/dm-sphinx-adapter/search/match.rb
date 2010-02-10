@@ -4,10 +4,10 @@ module DataMapper
   module Sphinx
     class Search
       # TODO: Move the modes factory from Sphinx::Query to here.
-      class Mode < Statement
+      class Match < Statement
 
         # Symbol for each mode.
-        def slug
+        def mode
           raise NotImplementedError
         end
       end # Mode

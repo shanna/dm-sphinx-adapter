@@ -2,16 +2,16 @@ module DataMapper
   module Sphinx
     class Search
       include Extlib::Assertions
-      attr_reader :search, :filters
+      attr_reader :match, :filter
 
-      def initialize(search, filters)
-        assert_kind_of 'search', search, Search::Statement # TODO: Add Search::Mode to subclass.
-        assert_kind_of 'filters', filters, Search::Filters
-        @search, @filters = search, filters
+      def initialize(match, filter)
+        assert_kind_of 'match', match, Search::Match
+        assert_kind_of 'filter', filter, Search::Filter
+        @match, @filter = match, filter
       end
 
       def native?
-        search.native? && filters.native?
+        match.native? && filter.native?
       end
     end # Search
   end # Sphinx

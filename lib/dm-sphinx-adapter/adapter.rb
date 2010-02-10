@@ -25,13 +25,13 @@ module DataMapper
         with_connection do |client|
           # TODO: Yuck. I can't really ditch the Search struct withou having naming collisions in Query but it's causing
           # some ugly and non obvious method chains here.
-          client.match_mode = query.search.search.slug
-          client.filters    = query.search.filters.statement
+          client.match_mode = query.search.match.mode
+          client.filters    = query.search.filter.statement
           client.limit      = query.limit.to_i  if query.limit
           client.offset     = query.offset.to_i if query.offset
           # TODO: Ordering (this is where I would get classes with the Query order methods).
 
-          client.query(query.search.search.statement, query.model.storage_name, '').map do |record|
+          client.query(query.search.match.statement, query.model.storage_name, '').map do |record|
             query.fields.zip(record[:attributes]).to_hash
           end
         end

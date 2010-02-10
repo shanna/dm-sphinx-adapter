@@ -1,12 +1,12 @@
-require 'lib/dm-sphinx-adapter/search/mode'
+require 'lib/dm-sphinx-adapter/search/match'
 
 module DataMapper
   module Sphinx
     class Search
-      class Extended2 < Mode
+      class Extended2 < Match
         include DataMapper::Sphinx::Query::Conditions
 
-        def slug
+        def mode
           :extended2
         end
 
@@ -39,6 +39,8 @@ module DataMapper
             end
           end
 
+          #--
+          # TODO: Phrase quoting when required?
           def quote(value)
             value.to_s.gsub(/[\(\)\|\-!@~"&\/]/){|char| "\\#{char}"}
           end

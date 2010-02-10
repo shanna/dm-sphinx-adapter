@@ -3,12 +3,12 @@ require 'lib/dm-sphinx-adapter/search/statement'
 module DataMapper
   module Sphinx
     class Search
-      class Filters < Statement
+      class Filter < Statement
         include DataMapper::Query::Conditions
         include Extlib::Assertions
 
         def statement
-          condition_statement(@query.conditions)
+          condition_statement(@query.conditions) || []
         end
 
         protected
