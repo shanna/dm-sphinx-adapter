@@ -1,4 +1,4 @@
-require 'lib/dm-sphinx-adapter/search/statement'
+require 'dm-sphinx-adapter/search/statement'
 
 module DataMapper
   module Sphinx
@@ -17,24 +17,25 @@ module DataMapper
             return if expression.empty?
 
             case operation
-              when AndOperation then expression
-              when NotOperation
-                expression[2] = false # Ick?
-                expression
+              when AndOperation then expression.flatten
+              when NotOperation then expression.map{|e| e.exclude = true; e}.flatten
               else # TODO: fail_native
             end
           end
 
           def comparison_statement(comparison)
-            field     = comparison.subject.field
-            value     = comparison.value.dup
-            statement = case comparison
-              when EqualToComparison then [field, value, true]
-              # gt, lt and whatever else filters support.
-              else fail_native("Comparison #{comparison.slug}'.") && return
+            field = comparison.subject.field
+            value = comparison.value
+            unless comparison.is_a?(EqualToComparison) || comparison.is_a?(InclusionComparison)
+              fail_native("Comparison #{comparison.slug}.")
+              return
             end
 
-            statement
+            Riddle::Client::Filter.new(comparison.subject.field, typecast(value), false)
+          end
+
+          def typecast(value)
+            value.is_a?(Range) ? value : [value].flatten
           end
       end
     end # Search

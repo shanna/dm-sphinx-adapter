@@ -1,4 +1,4 @@
-require 'lib/dm-sphinx-adapter/search/match'
+require 'dm-sphinx-adapter/search/match'
 
 module DataMapper
   module Sphinx
@@ -26,7 +26,7 @@ module DataMapper
           # TOOD: I really need a rule here about when a phrase is used or not.
           def comparison_statement(comparison)
             field = comparison.subject.field
-            value = comparison.value.dup
+            value = comparison.value
             case comparison
               when EqualToComparison   then '@%s %s'       % [field, quote(value)]
               when InclusionComparison then '@%s (%s)'     % [field, value.map{|v| quote(v)}.join('|')]
@@ -35,7 +35,7 @@ module DataMapper
               when ProximityComparison then '@%s "%s"~%d'  % [field, quote(value[0]), value[1]]
               when QuorumComparison    then '@%s "%s"/%d'  % [field, quote(value[0]), value[1]]
               when ExactComparison     then '@%s ="%s"'    % [field, quote(value)]
-              else fail_native("Comparison #{comparison.slug}'.") && return
+              else fail_native("Comparison #{comparison.slug}.") && return
             end
           end
 
