@@ -56,6 +56,11 @@ class SearchTest < Test::Unit::TestCase
       assert_equal '(!(@t_string (foo|bar)))', search.statement
     end
 
+    should 'handle raw conditions' do
+      search = search(:conditions => ['@* foo'])
+      assert_equal '(@* foo)', search.statement
+    end
+
     # TODO: Test 'and', 'or' connective operators.
   end
 

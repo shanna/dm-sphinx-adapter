@@ -25,6 +25,7 @@ module DataMapper
             case conditions
               when AbstractOperation  then operation_statement(conditions)
               when AbstractComparison then comparison_statement(conditions)
+              when Array              then conditions.first # TODO: Raw bind values.
             end
           end
 
