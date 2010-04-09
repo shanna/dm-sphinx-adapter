@@ -17,17 +17,16 @@ module DataMapper
         @match_mode = :extended2
       end
 
-      def query(*args)
+      def query(statement, index, comment = '')
         result = super
 
-        # TODO: connection.logger.info(
-        #   %q{'(%.3f): '%s' in '%s' found %d documents} % [result[:time], search, @index, result[:total]]
-        # )
-        # TODO: Connection.logger.warn(result[:warning]) unless result[:warning].blank?
-        # TODO: Connection.logger.error(result[:error]) unless result[:error].blank?
-        # TODO: Raise result[:error] also.
-        $stderr.puts 'WARNING: ' + result[:warning] unless result[:warnings].blank?
-        $stderr.puts 'ERROR: ' + result[:error] unless result[:error].blank?
+        # TODO: Filters.
+        DataMapper.logger.debug(
+          "(%1.6f) sphinx search:%s, mode: %s, index: %s" %
+          [result[:time], statement.inspect, @match_mode, index]
+        )
+        DataMapper.logger.warn(result[:warning]) unless result[:warning].blank?
+        DataMapper.logger.error(result[:error]) unless result[:error].blank?
 
         result.fetch(:matches, [])
       end

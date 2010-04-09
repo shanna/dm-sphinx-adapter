@@ -34,9 +34,7 @@ indexer = `indexer --config #{files}/sphinx.conf --all --rotate`
 raise %{Re-create index failed:\n #{indexer}} if indexer =~ /error|fatal/i
 sleep 1
 
-# :default is unused at the moment.
-# DataMapper.setup(:default, :adapter => 'in_memory', :database => 'dm_sphinx_adapter_test')
-# DataMapper.setup(:search,  :adapter => 'sphinx')
+# DataMapper::Logger.new($stdout, :debug)
 DataMapper.setup(:default, :adapter => 'sphinx')
 
 class Test::Unit::TestCase
