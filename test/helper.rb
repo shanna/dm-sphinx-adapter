@@ -1,4 +1,9 @@
-root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+root  = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+files = File.join(root, 'test', 'files')
+
+at_exit do
+  system("searchd -c #{files}/sphinx.conf --stop")
+end
 
 require File.join(root, 'gems', 'environment')
 Bundler.require_env(:development)
@@ -11,26 +16,20 @@ rescue LoadError
   exit 1
 end
 
-base  = File.join(File.dirname(__FILE__), '..')
-files = File.join(base, 'test', 'files')
-
-$:.unshift File.join(base, 'lib')
+$:.unshift File.join(root, 'lib')
 require 'dm-sphinx-adapter'
 
-class Test::Unit::TestCase
-end
-
 # Sphinx runner.
-Dir.chdir(base)
+Dir.chdir(root)
 begin
   TCPSocket.new('localhost', '9312')
 rescue
   puts 'Starting Sphinx...'
-  system("searchd --config #{files}/sphinx.conf") || exit
+  system("searchd -c #{files}/sphinx.conf") || exit
   system('ps aux | grep searchd')
 end
 
-indexer = `indexer --config #{files}/sphinx.conf --all --rotate`
+indexer = `indexer -c #{files}/sphinx.conf --all --rotate`
 raise %{Re-create index failed:\n #{indexer}} if indexer =~ /error|fatal/i
 sleep 1
 
