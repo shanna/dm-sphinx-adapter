@@ -1,22 +1,19 @@
 root  = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 files = File.join(root, 'test', 'files')
 
-at_exit do
-  system("searchd -c #{files}/sphinx.conf --stop")
-end
+#at_exit do
+#  system("searchd -c #{files}/sphinx.conf --stop")
+#end
 
 require File.join(root, 'gems', 'environment')
 Bundler.require_env(:development)
-require 'test/unit'
 
-begin
-  require 'shoulda'
-rescue LoadError
-  warn 'Shoulda is required for testing. Use gem bundle to install development gems.'
-  exit 1
-end
+require 'minitest/unit'
+require 'minitest/spec'
+require File.join(root, 'test/lib/minitest/pretty')
 
 $:.unshift File.join(root, 'lib')
+require 'extlib/blank' # Just to get up and running.
 require 'dm-sphinx-adapter'
 
 # Sphinx runner.
@@ -36,15 +33,11 @@ sleep 1
 # DataMapper::Logger.new($stdout, :debug)
 DataMapper.setup(:default, :adapter => 'sphinx')
 
-class Test::Unit::TestCase
+# Use DM shared spec model cleanup code.
+require 'dm-core/spec/lib/spec_helper'
+class MiniTest::Unit::TestCase
   def teardown
-    descendants = DataMapper::Model.descendants.dup.to_a
-    while model = descendants.shift
-      next unless Object.const_defined?(model.name.to_sym)
-      descendants.concat(model.descendants) if model.respond_to?(:descendants)
-      Object.send(:remove_const, model.name.to_sym)
-      DataMapper::Model.descendants.delete(model)
-    end
+    ::DataMapper::Spec.cleanup_models
   end
 end
 

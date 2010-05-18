@@ -2,7 +2,6 @@ require 'dm-core'
 require 'dm-sphinx-adapter/connection'
 
 # The adapter propper.
-require 'dm-sphinx-adapter/query_factory'
 require 'dm-sphinx-adapter/query'
 require 'dm-sphinx-adapter/query/conditions'
 require 'dm-sphinx-adapter/search'

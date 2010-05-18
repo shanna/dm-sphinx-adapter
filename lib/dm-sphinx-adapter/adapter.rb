@@ -37,6 +37,12 @@ module DataMapper
         end
       end
 
+      # ==== Returns
+      # DataMapper::Sphinx::Query
+      def new_query *args
+        Query.new(*args)
+      end
+
       protected
         def with_connection
           begin

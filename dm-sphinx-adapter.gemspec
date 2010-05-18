@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Shane Hanna"]
-  s.date = %q{2010-02-11}
+  s.date = %q{2010-05-18}
   s.email = %q{shane.hanna@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -27,7 +27,6 @@ Gem::Specification.new do |s|
      "lib/dm-sphinx-adapter/connection.rb",
      "lib/dm-sphinx-adapter/query.rb",
      "lib/dm-sphinx-adapter/query/conditions.rb",
-     "lib/dm-sphinx-adapter/query_factory.rb",
      "lib/dm-sphinx-adapter/search.rb",
      "lib/dm-sphinx-adapter/search/extended2.rb",
      "lib/dm-sphinx-adapter/search/filter.rb",
@@ -38,6 +37,7 @@ Gem::Specification.new do |s|
      "test/files/sphinx.conf",
      "test/files/test_xmlpipe2.xml",
      "test/helper.rb",
+     "test/lib/minitest/pretty.rb",
      "test/test_adapter.rb",
      "test/test_search_extended2.rb",
      "test/test_search_filter.rb"
@@ -45,13 +45,14 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/shanna/dm-sphinx-adapter}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{A DataMapper Sphinx adapter.}
   s.test_files = [
     "test/test_search_filter.rb",
      "test/test_search_extended2.rb",
      "test/test_adapter.rb",
      "test/files/model.rb",
+     "test/lib/minitest/pretty.rb",
      "test/helper.rb"
   ]
 
@@ -60,14 +61,14 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<dm-core>, ["~> 0.10.2"])
+      s.add_runtime_dependency(%q<dm-core>, ["~> 0.10.3"])
       s.add_runtime_dependency(%q<riddle>, ["~> 1.0.9"])
     else
-      s.add_dependency(%q<dm-core>, ["~> 0.10.2"])
+      s.add_dependency(%q<dm-core>, ["~> 0.10.3"])
       s.add_dependency(%q<riddle>, ["~> 1.0.9"])
     end
   else
-    s.add_dependency(%q<dm-core>, ["~> 0.10.2"])
+    s.add_dependency(%q<dm-core>, ["~> 0.10.3"])
     s.add_dependency(%q<riddle>, ["~> 1.0.9"])
   end
 end
