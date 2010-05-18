@@ -13,7 +13,6 @@ require 'minitest/spec'
 require File.join(root, 'test/lib/minitest/pretty')
 
 $:.unshift File.join(root, 'lib')
-require 'extlib/blank' # Just to get up and running.
 require 'dm-sphinx-adapter'
 
 # Sphinx runner.
