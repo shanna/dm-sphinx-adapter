@@ -5,7 +5,6 @@ module DataMapper
     class Search
       class Filter < Statement
         include DataMapper::Query::Conditions
-        include Extlib::Assertions
 
         def statement
           condition_statement(@query.conditions) || []

@@ -5,10 +5,8 @@ module DataMapper
       # TODO: Not sold on the name at all.
       class Statement
         include DataMapper::Query::Conditions
-        include Extlib::Assertions
 
         def initialize(query)
-          assert_kind_of 'query', query, DataMapper::Query
           @query, @native = query, []
         end
 
