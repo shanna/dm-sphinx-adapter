@@ -3,9 +3,10 @@ require 'dm-sphinx-adapter/search/match'
 module DataMapper
   module Sphinx
     class Search
-      class Extended2 < Match
-        include DataMapper::Sphinx::Query::Conditions
 
+      #--
+      # TODO: Phrase quoting when required?
+      class Extended2 < Match
         def mode
           :extended2
         end
@@ -37,12 +38,6 @@ module DataMapper
               when ExactComparison     then '@%s ="%s"'    % [field, quote(value)]
               else fail_native("Comparison #{comparison.slug}.") && return
             end
-          end
-
-          #--
-          # TODO: Phrase quoting when required?
-          def quote value
-            value.to_s.gsub(/[\(\)\|\-!@~"&\/]/){|char| "\\#{char}"}
           end
       end # Extended2
     end # Search

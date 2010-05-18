@@ -8,6 +8,9 @@ files = File.join(root, 'test', 'files')
 require File.join(root, 'gems', 'environment')
 Bundler.require_env(:development)
 
+# XXX:
+require 'extlib/blank'
+
 require 'minitest/unit'
 require 'minitest/spec'
 require File.join(root, 'test/lib/minitest/pretty')
