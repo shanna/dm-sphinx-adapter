@@ -11,7 +11,7 @@ module DataMapper
         end
 
         protected
-          def operation_statement(operation)
+          def operation_statement operation
             expression = operation.map{|op| condition_statement(op)}.compact
             return if expression.empty?
 
@@ -22,7 +22,7 @@ module DataMapper
             end
           end
 
-          def comparison_statement(comparison)
+          def comparison_statement comparison
             field = comparison.subject.field
             value = comparison.value
             unless comparison.is_a?(EqualToComparison) || comparison.is_a?(InclusionComparison)
@@ -33,7 +33,7 @@ module DataMapper
             Riddle::Client::Filter.new(comparison.subject.field, typecast(value), false)
           end
 
-          def typecast(value)
+          def typecast value
             value.is_a?(Range) ? value : [value].flatten
           end
       end

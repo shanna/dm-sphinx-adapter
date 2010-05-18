@@ -6,7 +6,7 @@ module DataMapper
       class Statement
         include DataMapper::Query::Conditions
 
-        def initialize(query)
+        def initialize query
           @query, @native = query, []
         end
 
@@ -19,7 +19,7 @@ module DataMapper
         end
 
         protected
-          def condition_statement(conditions)
+          def condition_statement conditions
             case conditions
               when AbstractOperation  then operation_statement(conditions)
               when AbstractComparison then comparison_statement(conditions)
@@ -28,16 +28,16 @@ module DataMapper
           end
 
           # Abstract.
-          def operation_statement(operation)
+          def operation_statement operation
             raise NotImplementedError
           end
 
           # Abstract.
-          def comparison_statement(comparison)
+          def comparison_statement comparison
             raise NotImplementedError
           end
 
-          def fail_native(why)
+          def fail_native why
             @native << why
           end
       end # Statement

@@ -3,7 +3,7 @@ require 'riddle'
 module DataMapper
   module Sphinx
     class Connection < Riddle::Client
-      def initialize(host = 'localhost', port = '9312')
+      def initialize host = 'localhost', port = '9312'
         super
         reset
       end
@@ -17,7 +17,7 @@ module DataMapper
         @match_mode = :extended2
       end
 
-      def query(statement, index, comment = '')
+      def query statement, index, comment = ''
         result = super
 
         # TODO: Filters.

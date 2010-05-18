@@ -5,23 +5,23 @@ module DataMapper
       # TODO: Error.
       # TODO: Wait for live indexing or someone to write a gateway/manager that will buffer and fake it?
       # Steal Solr's restful api for bonus points and create dm-search-adapter for Sphinx, Solr etc.
-      def create(resources) #:nodoc:
+      def create resources #:nodoc:
         0
       end
 
       #--
       # TODO: Allow updating of attributes.
-      def update(attributes, collection) #:nodoc:
+      def update attributes, collection #:nodoc:
         0
       end
 
       #--
       # TODO: Error.
-      def delete(query) #:nodoc:
+      def delete query #:nodoc:
         0
       end
 
-      def read(query)
+      def read query
         with_connection do |client|
           # TODO: Yuck. I can't really ditch the Search struct withou having naming collisions in Query but it's causing
           # some ugly and non obvious method chains here.

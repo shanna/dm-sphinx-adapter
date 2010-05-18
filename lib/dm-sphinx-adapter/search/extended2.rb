@@ -11,7 +11,7 @@ module DataMapper
         end
 
         protected
-          def operation_statement(operation)
+          def operation_statement operation
             expression = operation.map{|op| condition_statement(op)}.compact
             return if expression.empty?
 
@@ -24,7 +24,7 @@ module DataMapper
 
           #--
           # TOOD: I really need a rule here about when a phrase is used or not.
-          def comparison_statement(comparison)
+          def comparison_statement comparison
             field = comparison.subject.field
             value = comparison.value
             case comparison
@@ -41,7 +41,7 @@ module DataMapper
 
           #--
           # TODO: Phrase quoting when required?
-          def quote(value)
+          def quote value
             value.to_s.gsub(/[\(\)\|\-!@~"&\/]/){|char| "\\#{char}"}
           end
       end # Extended2

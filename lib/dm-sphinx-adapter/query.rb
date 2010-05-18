@@ -8,7 +8,7 @@ module DataMapper
       #--
       # TODO: Document extra :mode and :filters options.
       # TODO: This still smells 'iffy.
-      def initialize(repository, model, options = {})
+      def initialize repository, model, options = {}
         # The Query wouldn't pass validation if I didn't remove the extra arguments.
         mode   = options.delete(:mode)
         filter = options.delete(:filter)
