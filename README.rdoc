@@ -62,7 +62,7 @@ Alternatively supply a Hash:
 
   # Fire up your sphinx search daemon and start searching.
   docs  = repository(:search){ Item.all(name: 'barney')} # Search 'items' index for '@name barney'
-  items = Item.all(:id => docs.map(&:id)) # Search :default for all the document id's returned by sphinx.
+  items = Item.all(id: docs.map(&:id)) # Search :default for all the document id's returned by sphinx.
 
 === DataMapper and IsSearchable
 
@@ -94,7 +94,7 @@ using <tt>dm-sphinx-adapter</tt> such as <tt>#gt</tt> or <tt>#lt</tt> conditions
     property :name, String
 
     is :searchable # defaults to :search repository though you can be explicit:
-    # is :searchable, :repository: :sphinx
+    # is :searchable, repository: :sphinx
   end
 
   # Fire up your sphinx search daemon and start searching.
