@@ -28,7 +28,7 @@ describe 'Search Boolean' do
 
   it 'should treat Array .not operator as not operation of inclusion comparison' do
     search = search(:t_string.not => %w{foo bar})
-    assert_equal '(!((foo|bar)))', search.statement
+    assert_equal '(!(foo|bar))', search.statement
   end
 
   it 'should handle raw conditions' do

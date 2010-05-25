@@ -23,6 +23,7 @@ module DataMapper
           def comparison_statement comparison
             case comparison
               when EqualToComparison, ExactComparison then quote(comparison.value)
+              when InclusionComparison                then comparison.value.map{|v| quote(v)}.join('|')
               else fail_native("Comparison #{comparison.slug}.") && return
             end
           end
