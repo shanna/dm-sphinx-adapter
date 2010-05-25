@@ -12,6 +12,6 @@ require 'dm-sphinx-adapter/search/match/boolean'
 require 'dm-sphinx-adapter/search/match/extended2'
 require 'dm-sphinx-adapter/search/match/phrase'
 require 'dm-sphinx-adapter/search/sort/extended'
-require 'dm-sphinx-adapter/search/sort/rank'
+require 'dm-sphinx-adapter/search/sort/relevance'
 require 'dm-sphinx-adapter/adapter'
 

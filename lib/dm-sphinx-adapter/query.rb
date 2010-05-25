@@ -26,7 +26,7 @@ module DataMapper
           when :boolean        then Search::Match::Boolean.new(self)
           else raise ArgumentError, "+options[:mode]+ used an unknown mode #{mode.inspect}."
         end
-        sort    = order.size == 0 ? Search::Sort::Rank.new(self) : Search::Sort::Extended.new(self)
+        sort    = order.size == 0 ? Search::Sort::Relevance.new(self) : Search::Sort::Extended.new(self)
         @search = Search.new(match, filter, sort)
       end
     end # Query

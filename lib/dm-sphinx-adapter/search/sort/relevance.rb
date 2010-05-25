@@ -4,15 +4,15 @@ module DataMapper
   module Sphinx
     class Search
       module Sort
-        class Rank < Statement
+        class Relevance < Statement
           def mode
-            :rank
+            :relevance
           end
 
           def statement
             ''
           end
-        end # Rank
+        end # Relevance
       end # Sort
     end # Search
   end # Sphinx
