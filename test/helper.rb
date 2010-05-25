@@ -32,7 +32,7 @@ indexer = `indexer -c #{files}/sphinx.conf --all --rotate`
 raise %{Re-create index failed:\n #{indexer}} if indexer =~ /error|fatal/i
 sleep 1
 
-# DataMapper::Logger.new($stdout, :debug)
+DataMapper::Logger.new($stdout, :debug)
 DataMapper.setup(:default, :adapter => 'sphinx')
 
 # Use DM shared spec model cleanup code.

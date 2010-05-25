@@ -23,7 +23,7 @@ module DataMapper
         # TODO: Filters.
         DataMapper.logger.debug(
           "(%1.6f) sphinx search:%s, mode: %s, index: %s" %
-          [result[:time], statement.inspect, @match_mode, index]
+          [result[:time].to_f, statement.inspect, @match_mode, index]
         )
         DataMapper.logger.warn(result[:warning]) unless result[:warning].blank?
         DataMapper.logger.error(result[:error]) unless result[:error].blank?

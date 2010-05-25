@@ -1,8 +1,8 @@
 require File.join(File.dirname(__FILE__), 'helper')
 
-describe 'Search Any' do
+describe 'Search All' do
   def search conditions = {}
-    DataMapper::Sphinx::Search::Any.new(
+    DataMapper::Sphinx::Search::Match::All.new(
       DataMapper::Sphinx::Query.new(::Item.repository, ::Item, conditions)
     )
   end
@@ -25,8 +25,6 @@ describe 'Search Any' do
     search = search(:t_string => 'foo', :t_text => 'bar')
     assert search.statement =~ /foo bar|bar foo/
   end
-
-  # TODO: or operator.
 
   it 'should handle raw conditions' do
     search = search(:conditions => ['foo'])

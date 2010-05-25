@@ -1,14 +1,14 @@
 module DataMapper
   module Sphinx
     class Search
-      attr_reader :match, :filter
+      attr_reader :match, :filter, :sort
 
-      def initialize match, filter
-        @match, @filter = match, filter
+      def initialize match, filter, sort
+        @match, @filter, @sort = match, filter, sort
       end
 
       def native?
-        match.native? && filter.native?
+        match.native? && filter.native? && sort.native?
       end
     end # Search
   end # Sphinx

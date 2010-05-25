@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'helper')
 
 describe 'Search Phrase' do
   def search conditions = {}
-    DataMapper::Sphinx::Search::Phrase.new(
+    DataMapper::Sphinx::Search::Match::Phrase.new(
       DataMapper::Sphinx::Query.new(::Item.repository, ::Item, conditions)
     )
   end

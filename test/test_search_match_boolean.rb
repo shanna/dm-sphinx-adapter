@@ -1,8 +1,8 @@
 require File.join(File.dirname(__FILE__), 'helper')
 
-describe 'Search All' do
+describe 'Search Boolean' do
   def search conditions = {}
-    DataMapper::Sphinx::Search::All.new(
+    DataMapper::Sphinx::Search::Match::Boolean.new(
       DataMapper::Sphinx::Query.new(::Item.repository, ::Item, conditions)
     )
   end
@@ -18,17 +18,24 @@ describe 'Search All' do
 
   it 'should treat nil operator as equal comparison' do
     search = search(:t_string => 'foo')
-    assert_equal 'foo', search.statement
+    assert_equal '(foo)', search.statement
   end
 
-  it 'should allow and connective operator' do
-    search = search(:t_string => 'foo', :t_text => 'bar')
-    assert search.statement =~ /foo bar|bar foo/
+  it 'should treat .not opeartor as not operation' do
+    search = search(:t_string.not => 'foo')
+    assert_equal '(!(foo))', search.statement
+  end
+
+  it 'should treat Array .not operator as not operation of inclusion comparison' do
+    search = search(:t_string.not => %w{foo bar})
+    assert_equal '(!(foo|bar))', search.statement
   end
 
   it 'should handle raw conditions' do
     search = search(:conditions => ['foo'])
-    assert_equal 'foo', search.statement
+    assert_equal '(foo)', search.statement
   end
+
+  # TODO: Test 'and', 'or' connective operators.
 end
 

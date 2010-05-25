@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'helper')
 
 describe 'Search Extended2' do
   def search conditions = {}
-    DataMapper::Sphinx::Search::Extended2.new(
+    DataMapper::Sphinx::Search::Match::Extended2.new(
       DataMapper::Sphinx::Query.new(::Item.repository, ::Item, conditions)
     )
   end
