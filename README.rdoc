@@ -9,7 +9,7 @@ A DataMapper Sphinx adapter.
 == Dependencies
 
 Ruby::
-* dm-core           ~> 0.10.2
+* dm-core           ~> 1.0.0
 * dm-is-searchable  ~> 0.9.7 (optional)
 * riddle            ~> 1.0.9
 
@@ -100,6 +100,41 @@ using <tt>dm-sphinx-adapter</tt> such as <tt>#gt</tt> or <tt>#lt</tt> conditions
   # Fire up your sphinx search daemon and start searching.
   items = Item.search(name: 'barney') # Search 'items' index for '@name barney'
 
+== Changes for dm-core >= 1.0 (dm-sphinx-adapter >= 0.9)
+
+=== Operators
+
+The DataMapper query symbol operator scheme now supports position, phrase, proximity, quorum and exact Sphinx query
+operators.
+
+  # @subject[50] "hello world"
+  Item.all(:subject.position => ['hello world', 50])
+
+  # @subject "hello world"
+  Item.all(:subject.phrase => 'hello world')
+
+  # @subject "hello world"~10
+  Item.all(:subject.proximity => ['hello world', 10])
+
+  # @subject "hello world"/10
+  Item.all(:subject.quorum => ['hello world', 10])
+
+  # @subject ="hello world"
+  Item.all(:subject.exact => 'hello world')
+
+=== Filters
+
+Sphinx query filters are now passed as a separate explicit set of conditions to the DataMapper query constructor.
+
+  Item.all(name: 'barney', filter: {age: 50})
+
+==== Modes
+
+Sphinx query search modes including :extended2 (default), :all, :any, :phrase and :boolean are now supported if you
+need them.
+
+  Item.all(name: %w{barney fred}, mode: :any)
+
 == Sphinx Configuration
 
 No limitations, restrictions or requirement are imposed on your sphinx configuration. The adapter will not generate nor
@@ -116,5 +151,6 @@ Try one of these fine offerings:
 
 == Contributing
 
-Go nuts. Just send me a pull request (github or otherwise) when you are happy with your code.
+In short, go nuts! There is no style guide and I do not care if you write tests or comment code. If you write something
+neat just send me a pull request, tweet, email or yell at me in the street.
 
